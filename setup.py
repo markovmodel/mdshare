@@ -40,7 +40,7 @@ setup(
     name='mdshare',
     author='Christoph Wehmeyer',
     author_email='christoph.wehmeyer@fu-berlin.de',
-    url='https://github.com/cwehmeyer/mdshare',
+    url='https://github.com/markovmodel/mdshare',
     description=description,
     packages=find_packages(),
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
