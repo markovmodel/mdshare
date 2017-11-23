@@ -77,25 +77,20 @@ def lazy_download(
         blur (float): degree of blur to randomize the delay
     '''
     if working_directory is None:
-        print('downloading to tmp')
         local_path = None
     else:
         try:
             os.makedirs(working_directory, exist_ok=True)
-            print('creating wdir [-p]: ' + str(working_directory))
         except OSError as e:
             if e.errno == errno.EEXIST and os.path.isdir(working_directory):
-                print('existing wdir: ' + str(working_directory))
                 pass
             else:
                 raise
         if local_filename is None:
-            print('using remote filename for local: ' + str(remote_filename))
             local_filename = remote_filename
         local_path = os.path.join(working_directory, local_filename)
-        print('checking local path: ' + str(local_path))
     if local_path is not None and os.path.exists(local_path):
-        print('existing local file: ' + str(local_path))
         return local_path
-    print('calling downloader: %s %s %s' % (str(repository), str(remote_filename), str(local_path)))
-    return download_file(repository, remote_filename, local_filename=local_path)
+    return attempted_download(
+        repository, remote_filename, local_filename=local_path,
+        max_attempts=max_attempts, delay=delay, blur=blur)
