@@ -30,8 +30,7 @@ import sys
 #         sys.exit(errno)
 
 description = '''
-A toolbox for dimensionality reduction of time series data with a
-time-lagged autoencoder.
+Get access to our MD data files.
 '''
 
 setup(
@@ -47,6 +46,3 @@ setup(
     #install_requires=['numpy'],
     #tests_require=['pytest'],
     zip_safe=False)
-
-
-
