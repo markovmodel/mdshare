@@ -4,7 +4,7 @@ Get access to our MD data files.
 This is a downloader for molecular dynamics (MD) data from a public FTP server at FU berlin.
 
 ## Example
-This code will download (if the file does not already exist locally) a featurized set of three alanine dipeptide MD trajectories and store its content of three ``numpy.ndarray`` objects (each of ``shape=[250000, 2], dtype=numpy.float32``) in the list ``trajs``:
+This code will download a file (if it does not already exist locally) with a featurized set of three alanine dipeptide MD trajectories and store its content of three ``numpy.ndarray`` objects (each of ``shape=[250000, 2], dtype=numpy.float32``) in the list ``trajs``:
 ```python
 import mdshare
 import numpy as np
