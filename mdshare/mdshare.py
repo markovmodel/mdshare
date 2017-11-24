@@ -30,7 +30,7 @@ def download_file(repository, remote_filename, local_path=None):
     '''
     filename, message = urlretrieve(
         repository + remote_filename,
-        filename=local_filename)
+        filename=local_path)
     return filename
 
 def attempted_download(
@@ -52,26 +52,32 @@ def attempted_download(
         try:
             filename = download_file(
                 repository, remote_filename, local_path=local_path)
-            return filename
         except HTTPError as e:
-            if e.code not in [408, 500, 503, 504]:
+            if e.code == 404:
+                print('File not found: ' + e.url)
                 raise
+            else:
+                print(e)
         except IOError as e:
-            if e.errno not in [110]:
-                raise
+            print(e)
+        try:
+            return filename
+        except UnboundLocalError:
+            pass
     raise RuntimeError(
         'could not download file: ' + str(repository + remote_filename))
 
-def lazy_download(
-    repository, remote_filename, working_directory='.', local_filename=None,
+def load(
+    remote_filename, working_directory='.', local_filename=None,
+    repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
     max_attempts=3, delay=3, blur=0.1):
     '''Download a file if it is necessary.
 
     Arguments:
-        repository (str): URL of the remote source directory
         remote_filename (str): name of the file in the repository
         working_directory (str): directory where the file should be saved
         local_filename (str): name under which the file should be saved
+        repository (str): URL of the remote source directory
         max_attempts (int): number of download attempts
         delay (int): delay between attempts in seconds
         blur (float): degree of blur to randomize the delay
@@ -92,5 +98,5 @@ def lazy_download(
     if local_path is not None and os.path.exists(local_path):
         return local_path
     return attempted_download(
-        repository, remote_filename, local_filename=local_path,
+        repository, remote_filename, local_path=local_path,
         max_attempts=max_attempts, delay=delay, blur=blur)
