@@ -16,7 +16,9 @@ with np.load(local_filename) as fh:
 
 By default, the ``mdshare.load()`` function will look in and download to the current directory (function parameter ``working_directory='.'``). If you instead set this parameter to ``None``,
 ```python
-local_filename = mdshare.load('alanine-dipeptide-3x250ns-backbone-dihedrals.npz', working_directory=None)
+local_filename = mdshare.load(
+    'alanine-dipeptide-3x250ns-backbone-dihedrals.npz',
+    working_directory=None)
 ```
 the file will be downloaded to a temporary directory with a randomly chosen name. In both cases, the function will return the path to the local file.
 
