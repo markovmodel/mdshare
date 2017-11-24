@@ -29,10 +29,6 @@ import sys
 #         errno = pytest.main(self.pytest_args)
 #         sys.exit(errno)
 
-description = '''
-Get access to our MD data files.
-'''
-
 setup(
     #cmdclass={'test': PyTest},
     use_scm_version=True,
@@ -40,7 +36,7 @@ setup(
     author='Christoph Wehmeyer',
     author_email='christoph.wehmeyer@fu-berlin.de',
     url='https://github.com/markovmodel/mdshare',
-    description=description,
+    description='Get easy access to our public data files.',
     packages=find_packages(),
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
     #install_requires=['numpy'],
