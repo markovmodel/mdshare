@@ -30,8 +30,7 @@ import sys
 #         sys.exit(errno)
 
 description = '''
-A toolbox for dimensionality reduction of time series data with a
-time-lagged autoencoder.
+Get access to our MD data files.
 '''
 
 setup(
@@ -40,13 +39,10 @@ setup(
     name='mdshare',
     author='Christoph Wehmeyer',
     author_email='christoph.wehmeyer@fu-berlin.de',
-    url='https://github.com/cwehmeyer/mdshare',
+    url='https://github.com/markovmodel/mdshare',
     description=description,
     packages=find_packages(),
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
     #install_requires=['numpy'],
     #tests_require=['pytest'],
     zip_safe=False)
-
-
-
