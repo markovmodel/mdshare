@@ -15,7 +15,7 @@ permalink: /ALA2/
 | Simulation time | 250 ns |
 | Frame spacing | 1 ps |
 | Temperature | 300 K |
-| Volume | (2.3222 nm)<sup>3</sup> periodic box |
+| Volume | (2.3222 nm)^3 periodic box |
 | Solvation | 651 TIP3P waters |
 | Electrostatics | PME |
 | PME real-space cutoff | 0.9 nm |
