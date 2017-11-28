@@ -1,5 +1,5 @@
 ---
-title: mdshare
+title: mdshare • alanine dipeptide
 layout: default
 permalink: /ALA2/
 ---
