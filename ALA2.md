@@ -5,6 +5,7 @@ permalink: /ALA2/
 ---
 
 # Alanine dipeptide
+
 | Property | Value |
 |----------|------:|
 | Code | ACEMD |
