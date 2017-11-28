@@ -27,7 +27,7 @@ permalink: /ALA2/
 
 ## Contents
 ### Featurized data
-Each file contains three `numpy.ndarray(shape=[250000, n_features], dtype=numpy.float32)` objects (keys: `arr_0`, `arr_1`, `arr_2`) from three independent simulations.
+Each file contains three **numpy.ndarray(shape=[250000, n_features], dtype=numpy.float32)** objects (keys: **arr_0**, **arr_1**, **arr_2**) from three independent simulations.
 -  [alanine-dipeptide-3x250ns-backbone-dihedrals](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-backbone-dihedrals.npz)
 -  [alanine-dipeptide-3x250ns-heavy-atom-distances](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-heavy-atom-distances.npz)
 -  [alanine-dipeptide-3x250ns-heavy-atom-positions](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-heavy-atom-positions.npz)

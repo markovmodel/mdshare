@@ -4,7 +4,7 @@ layout: default
 ---
 
 # mdshare
-The `mdshare` package provides a python-based downloader for molecular dynamics (MD) data from a public FTP server at FU Berlin.
+The **mdshare** package provides a python-based downloader for molecular dynamics (MD) data from a public FTP server at FU Berlin.
 
 This website provides an overview which data is available.
 
