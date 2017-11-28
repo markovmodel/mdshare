@@ -12,18 +12,22 @@ permalink: /ALA2/
 | Forcefield | AMBER ff-99SB-ILDN |
 | Integrator | Langevin |
 | Integrator time step | 2 fs |
+| Simulation time | 250 ns |
+| Frame spacing | 1 ps |
 | Temperature | 300 K |
-| Volume | (2.3222 nm)$^3$ periodic box |
+| Volume | (2.3222 nm)<sup>3</sup> periodic box |
 | Solvation | 651 TIP3P waters |
 | Electrostatics | PME |
 | PME real-space cutoff | 0.9 nm |
 | PME grid spacing | 0.1 nm |
 | PME updates | every two time steps |
 | Constraints | all bonds between hydrogens and heavy atoms |
-| License | <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a> |
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a>
 
 ## Contents
 ### Featurized data
+Each file contains three `numpy.ndarray(shape=[250000, n_features], dtype=numpy.float32)` objects (keys: `arr_0`, `arr_1`, `arr_2`) from three independent simulations.
 -  [alanine-dipeptide-3x250ns-backbone-dihedrals](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-backbone-dihedrals.npz)
 -  [alanine-dipeptide-3x250ns-heavy-atom-distances](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-heavy-atom-distances.npz)
 -  [alanine-dipeptide-3x250ns-heavy-atom-positions](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-heavy-atom-positions.npz)
