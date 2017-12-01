@@ -7,7 +7,7 @@ permalink: /ALA2/
 # Alanine dipeptide
 
 | Property | Value |
-|----------|------:|
+|:---------|------:|
 | Code | ACEMD |
 | Forcefield | AMBER ff-99SB-ILDN |
 | Integrator | Langevin |
