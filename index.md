@@ -13,7 +13,7 @@ This website provides an overview which data is available.
 
 ## Contents
 
--  [Alanine dipeptide](ALA2)
+-  [Alanine dipeptide](ALA2#alanine-dipeptide)
 
 ## Downloader installation
 ```bash
