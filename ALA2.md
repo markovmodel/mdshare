@@ -36,4 +36,4 @@ Each file contains three **numpy.ndarray(shape=[250000, n_features], dtype=numpy
 -  F. N&uuml;ske, *et al*: [Markov State Models from short non-Equilibrium Simulations - Analysis and Correction of Estimation Bias](http://arxiv.org/abs/1701.01665), *J. Chem. Phys.* **146** (2017), 094104.
 -  C. Wehmeyer and F. No&eacute;: [Time-lagged autoencoders: Deep learning of slow collective variables for molecular kinetics](https://arxiv.org/abs/1710.11239) (2017), arXiv:1710.11239 [stat.ML]
 
-<div style="text-align: right">[back](../)</div>
+<div style="text-align: right"><a href="../">back</a></div>
