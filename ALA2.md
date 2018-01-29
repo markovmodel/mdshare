@@ -29,9 +29,9 @@ permalink: /ALA2/
 ### Raw data
 PDB file and DCD files of three independent simulations.
 -  [alanine-dipeptide-nowater.pdb](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-nowater.pdb)
--  [alanine-dipeptide-0-250ns-nowater.pdb](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-0-250ns-nowater.dcd)
--  [alanine-dipeptide-1-250ns-nowater.pdb](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-1-250ns-nowater.dcd)
--  [alanine-dipeptide-2-250ns-nowater.pdb](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-2-250ns-nowater.dcd)
+-  [alanine-dipeptide-0-250ns-nowater.dcd](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-0-250ns-nowater.dcd)
+-  [alanine-dipeptide-1-250ns-nowater.dcd](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-1-250ns-nowater.dcd)
+-  [alanine-dipeptide-2-250ns-nowater.dcd](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-2-250ns-nowater.dcd)
 
 ### Featurized data
 Each file contains three **numpy.ndarray(shape=[250000, n_features], dtype=numpy.float32)** objects (keys: **arr_0**, **arr_1**, **arr_2**) from three independent simulations.
