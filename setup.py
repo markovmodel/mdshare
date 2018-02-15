@@ -16,21 +16,21 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from setuptools import setup, find_packages
-# from setuptools.command.test import test as TestCommand
+from setuptools.command.test import test as TestCommand
 import sys
 
-# class PyTest(TestCommand):
-#     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
-#     def initialize_options(self):
-#         TestCommand.initialize_options(self)
-#         self.pytest_args = ['tae']
-#     def run_tests(self):
-#         import pytest
-#         errno = pytest.main(self.pytest_args)
-#         sys.exit(errno)
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = ['mdshare']
+    def run_tests(self):
+        import pytest
+        errno = pytest.main(self.pytest_args)
+        sys.exit(errno)
 
 setup(
-    #cmdclass={'test': PyTest},
+    cmdclass={'test': PyTest},
     use_scm_version=True,
     name='mdshare',
     author='Christoph Wehmeyer',
@@ -39,8 +39,8 @@ setup(
     description='Get easy access to our public data files.',
     packages=find_packages(),
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
-    #install_requires=['numpy'],
-    #tests_require=['pytest'],
+    install_requires=['numpy'],
+    tests_require=['pytest'],
     zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',
