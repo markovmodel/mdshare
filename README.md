@@ -1,6 +1,8 @@
 # mdshare
 Get access to our MD data files.
 
+[![CircleCI](https://circleci.com/gh/markovmodel/mdshare/tree/master.svg?style=svg)](https://circleci.com/gh/markovmodel/mdshare/tree/master)
+
 This is a downloader for molecular dynamics (MD) data from a public FTP server at FU Berlin. See https://markovmodel.github.io/mdshare/ for a full list of available datasets and terms of use.
 
 ## Example
