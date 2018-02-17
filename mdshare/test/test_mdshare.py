@@ -18,10 +18,7 @@
 from .. import load
 import os
 import pytest
-try:
-    from urllib.error import HTTPError
-except ImportError:
-    from urllib2 import HTTPError
+from urllib.error import HTTPError
 
 def examine_test_file(path):
     with open(path, 'r') as fh:
@@ -29,6 +26,7 @@ def examine_test_file(path):
         assert int(fh.readline()[:-1]) == 1
         assert float(fh.readline()[:-1]) == 2.0
         assert float(fh.readline()) == 3.0
+    os.remove(path)
 
 def test_load_npz_file_local():
     examine_test_file(load('mdshare-test.txt'))
