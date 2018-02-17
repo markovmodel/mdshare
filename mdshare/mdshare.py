@@ -85,13 +85,7 @@ def load(
     if working_directory is None:
         local_path = None
     else:
-        try:
-            os.makedirs(working_directory, exist_ok=True)
-        except OSError as e:
-            if e.errno == errno.EEXIST and os.path.isdir(working_directory):
-                pass
-            else:
-                raise
+        os.makedirs(working_directory, exist_ok=True)
         if local_filename is None:
             local_filename = remote_filename
         local_path = os.path.join(working_directory, local_filename)

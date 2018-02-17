@@ -16,38 +16,37 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .. import load
-import numpy as np
 import os
 import pytest
-import urllib
+try:
+    from urllib.error import HTTPError
+except ImportError:
+    from urllib2 import HTTPError
 
 def examine_test_file(path):
-    with np.load(path) as fh:
-        np.testing.assert_equal(
-            fh['range_0_100_int16'],
-            np.arange(0, 100).astype(np.int16))
-        np.testing.assert_equal(
-            fh['linspace_0_1_100_float32'],
-            np.linspace(0, 1, 100).astype(np.float32).reshape(25, -1))
-        os.remove(path)
+    with open(path, 'r') as fh:
+        assert fh.readline()[:-1] == 'This is a test file'
+        assert int(fh.readline()[:-1]) == 1
+        assert float(fh.readline()[:-1]) == 2.0
+        assert float(fh.readline()) == 3.0
 
 def test_load_npz_file_local():
-    examine_test_file(load('mdshare-test.npz'))
+    examine_test_file(load('mdshare-test.txt'))
 
 def test_load_npz_file_temp():
     examine_test_file(load(
-        'mdshare-test.npz', working_directory=None))
+        'mdshare-test.txt', working_directory=None))
 
 def test_load_npz_file_local_newname():
     examine_test_file(load(
-        'mdshare-test.npz', local_filename='testfile.npz'))
+        'mdshare-test.txt', local_filename='testfile.txt'))
 
 def test_load_npz_file_temp_newname():
     examine_test_file(load(
-        'mdshare-test.npz',
+        'mdshare-test.txt',
         working_directory=None,
-        local_filename='testfile.npz'))
+        local_filename='testfile.txt'))
 
 def test_load_nonexistent_url():
-    with pytest.raises(urllib.error.HTTPError):
+    with pytest.raises(HTTPError):
         load('non-existent-file-on-the-ftp-server')

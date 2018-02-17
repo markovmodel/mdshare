@@ -39,7 +39,7 @@ setup(
     description='Get easy access to our public data files.',
     packages=find_packages(),
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
-    install_requires=['numpy'],
+    install_requires=[],
     tests_require=['pytest'],
     zip_safe=False,
     classifiers=[
