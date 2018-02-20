@@ -25,17 +25,3 @@ local_filename = mdshare.load(
 the file will be downloaded to a temporary directory with a randomly chosen name. In both cases, the function will return the path to the local file.
 
 Should the requested file already be present in the ``working_directory``, the download is skipped.
-
-Use ``mdshare.catalogue()`` to view the files and filesizes of the available trajectories:
-
-```python
-mdshare.catalogue()
-```
-Produces the output:
-```
-alanine-dipeptide-0-250ns-nowater.dcd                        86 MB
-alanine-dipeptide-1-250ns-nowater.dcd                        86 MB
-alanine-dipeptide-2-250ns-nowater.dcd                        86 MB
-alanine-dipeptide-3x250ns-backbone-dihedrals.npz             6 MB
-...
-```
