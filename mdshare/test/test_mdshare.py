@@ -19,7 +19,7 @@ from .. import load
 import os
 import pytest
 from urllib.error import HTTPError
-
+from mdshare import  catalogue
 def examine_test_file(path):
     with open(path, 'r') as fh:
         assert fh.readline()[:-1] == 'This is a test file'
@@ -48,3 +48,7 @@ def test_load_npz_file_temp_newname():
 def test_load_nonexistent_url():
     with pytest.raises(HTTPError):
         load('non-existent-file-on-the-ftp-server')
+
+def test_default_ftp_runs():
+    catalogue()
+

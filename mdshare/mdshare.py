@@ -19,6 +19,8 @@ import os
 import errno
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
+from ftplib import FTP as _FTP
+from humanfriendly import format_size as _fs
 
 def download_file(repository, remote_filename, local_path=None):
     '''Download a file.
@@ -94,3 +96,26 @@ def load(
     return attempted_download(
         repository, remote_filename, local_path=local_path,
         max_attempts=max_attempts, delay=delay, blur=blur)
+
+def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
+    r""" Prints a human-friendly list of availaible files
+    and filesizes in :obj:repository
+
+    :param repository: string, address of the FTP server
+    """
+
+    repository = repository.lstrip('http://').split('/')
+
+    # Login to the FTP and get available files
+    iftp = _FTP(repository[0])
+    iftp.login()
+    # Go to subdirectories
+    for idir in repository[1:]:
+        iftp.cwd(idir)
+    # Get the ls -l output
+    avail_files = {tup[0]:tup[1] for tup in iftp.mlsd() if tup[0] not in ['.','..']}
+    iftp.close()
+
+    # Print it human-friendly
+    for key, value in sorted(avail_files.items()):
+        print('%-060s %s' % (key, _fs(int(value["size"]))))
