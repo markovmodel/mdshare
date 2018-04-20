@@ -21,6 +21,8 @@ from urllib.request import urlretrieve
 from urllib.error import HTTPError
 from ftplib import FTP as _FTP
 from humanfriendly import format_size as _fs
+from fnmatch import fnmatch as _fnmatch
+
 
 def download_file(repository, remote_filename, local_path=None):
     '''Download a file.
@@ -97,15 +99,7 @@ def load(
         repository, remote_filename, local_path=local_path,
         max_attempts=max_attempts, delay=delay, blur=blur)
 
-
-def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
-    r""" Prints a human-friendly list of availaible files
-    and filesizes in :obj:repository
-
-    :param repository: string, address of the FTP server
-    """
-
-    repository = repository.lstrip('http://').split('/')
+def _avail_files_dict(repository):
 
     # Login to the FTP and get available files
     iftp = _FTP(repository[0])
@@ -114,9 +108,32 @@ def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
     for idir in repository[1:]:
         iftp.cwd(idir)
     # Get the ls -l output
-    avail_files = {tup[0]:tup[1] for tup in iftp.mlsd() if tup[0] not in ['.','..']}
+
+    afd = {tup[0]:tup[1] for tup in iftp.mlsd() if tup[0] not in ['.','..']}
     iftp.close()
+
+    return afd
+
+def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
+    r""" Prints a human-friendly list of availaible files
+    and filesizes in :obj:repository
+
+    :param repository: string, address of the FTP server
+    """
+
+    avail_files =  _avail_files_dict(repository.lstrip('http://').split('/'))
 
     # Print it human-friendly
     for key, value in sorted(avail_files.items()):
         print('%-060s %s' % (key, _fs(int(value["size"]))))
+
+def search(filename_pattern, repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
+    r""" Returns a list of available files matching the :obj:filename_pattern
+
+    :param filname_pattern: String with the filename pattern, allows for Unix shell-style wildcards, eg. di-Ala*xtc
+    :param repository: ftp repository where to look for files
+    :return: list with matching files in the :obj:repository
+    """
+
+    avail_files =  _avail_files_dict(repository.lstrip('http://').split('/'))
+    return [key for key in sorted(avail_files.keys()) if _fnmatch(key, filename_pattern)]
