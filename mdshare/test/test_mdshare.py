@@ -19,7 +19,7 @@ from .. import load
 import os
 import pytest
 from urllib.error import HTTPError
-from mdshare import  catalogue
+from mdshare import catalogue, search
 
 def examine_test_file(path):
     with open(path, 'r') as fh:
@@ -52,3 +52,9 @@ def test_load_nonexistent_url():
 
 def test_default_ftp_runs():
     catalogue()
+
+def test_find_testfile():
+    # Several posix regexps
+    assert 'mdshare-test.txt' in search('mdshare-test.txt')
+    assert 'mdshare-test.txt' in search('mdshare*test*')
+    assert 'mdshare-test.txt' in search('mdshare-test.???')
