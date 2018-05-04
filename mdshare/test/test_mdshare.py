@@ -15,11 +15,10 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .. import load
+from .. import load, catalogue, search
 import os
 import pytest
 from urllib.error import HTTPError
-from mdshare import catalogue, search
 
 def examine_test_file(path):
     with open(path, 'r') as fh:
@@ -54,7 +53,6 @@ def test_default_ftp_runs():
     catalogue()
 
 def test_find_testfile():
-    # Several posix regexps
     assert 'mdshare-test.txt' in search('mdshare-test.txt')
     assert 'mdshare-test.txt' in search('mdshare*test*')
     assert 'mdshare-test.txt' in search('mdshare-test.???')
