@@ -17,6 +17,7 @@
 
 import os
 import errno
+import warnings
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
 from ftplib import FTP
@@ -85,6 +86,10 @@ def load(
         delay (int): delay between attempts in seconds
         blur (float): degree of blur to randomize the delay
     '''
+    warnings.warn(
+        'load() is deprecated, use fetch() instead',
+        DeprecationWarning,
+        stacklevel=2)
     if working_directory is None:
         local_path = None
     else:
