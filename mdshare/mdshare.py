@@ -147,11 +147,14 @@ def fetch(
         url = '%s/%s' % (repository, filename_pattern)
         print('File not found: ' + url)
         raise HTTPError(url, 404, 'File(s) not found', None, None)
-    return [
+    result = [
         download_wrapper(
             remote_filename, working_directory=working_directory,
             repository=repository, max_attempts=max_attempts,
             delay=delay, blur=blur) for remote_filename in files]
+    if len(result) == 1:
+        return result[0]
+    return result
 
 def get_available_files_dict(repository):
     # Login to the FTP and get available files

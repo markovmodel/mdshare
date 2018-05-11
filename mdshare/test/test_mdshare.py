@@ -52,7 +52,7 @@ def test_load_nonexistent_url():
 def test_fetch_npz_file_local():
     for offset in range(2):
         examine_test_file(
-            fetch('mdshare-test-%02d.txt' % offset)[0],
+            fetch('mdshare-test-%02d.txt' % offset),
             offset=offset)
 
 def test_fetch_npz_file_temp():
