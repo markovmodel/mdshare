@@ -15,33 +15,33 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .. import load, catalogue, search
+from .. import fetch, load, catalogue, search
 import os
 import pytest
 from urllib.error import HTTPError
 
-def examine_test_file(path):
+def examine_test_file(path, offset=0):
     with open(path, 'r') as fh:
         assert fh.readline()[:-1] == 'This is a test file'
-        assert int(fh.readline()[:-1]) == 1
-        assert float(fh.readline()[:-1]) == 2.0
-        assert float(fh.readline()) == 3.0
+        assert int(fh.readline()[:-1]) == 1 + offset
+        assert float(fh.readline()[:-1]) == 2.0 + offset
+        assert float(fh.readline()) == 3.0 + offset
     os.remove(path)
 
 def test_load_npz_file_local():
-    examine_test_file(load('mdshare-test.txt'))
+    examine_test_file(load('mdshare-test-00.txt'))
 
 def test_load_npz_file_temp():
     examine_test_file(load(
-        'mdshare-test.txt', working_directory=None))
+        'mdshare-test-00.txt', working_directory=None))
 
 def test_load_npz_file_local_newname():
     examine_test_file(load(
-        'mdshare-test.txt', local_filename='testfile.txt'))
+        'mdshare-test-00.txt', local_filename='testfile.txt'))
 
 def test_load_npz_file_temp_newname():
     examine_test_file(load(
-        'mdshare-test.txt',
+        'mdshare-test-00.txt',
         working_directory=None,
         local_filename='testfile.txt'))
 
@@ -49,10 +49,27 @@ def test_load_nonexistent_url():
     with pytest.raises(HTTPError):
         load('non-existent-file-on-the-ftp-server')
 
-def test_default_ftp_runs():
+def test_fetch_npz_file_local():
+    for offset in range(2):
+        examine_test_file(
+            fetch('mdshare-test-%02d.txt' % offset)[0],
+            offset=offset)
+
+def test_fetch_npz_file_temp():
+    files = fetch('mdshare-test-??.txt', working_directory=None)
+    for offset, file in enumerate(files):
+        examine_test_file(file, offset=offset)
+
+def test_fetch_nonexistent_url():
+    with pytest.raises(HTTPError):
+        fetch('non-existent-file-on-the-ftp-server')
+
+def test_catalogue():
     catalogue()
 
-def test_find_testfile():
-    assert 'mdshare-test.txt' in search('mdshare-test.txt')
-    assert 'mdshare-test.txt' in search('mdshare*test*')
-    assert 'mdshare-test.txt' in search('mdshare-test.???')
+def test_search():
+    assert 'mdshare-test-00.txt' in search('mdshare-test-??.txt')
+    assert 'mdshare-test-00.txt' in search('mdshare*test*')
+    assert 'mdshare-test-00.txt' in search('mdshare-test-00.???')
+    assert 'mdshare-test-01.txt' not in search('mdshare-test-00.???')
+    assert 'mdshare-test-0i.txt' not in search('mdshare-test-??.???')

@@ -25,4 +25,4 @@ del get_distribution, DistributionNotFound
 __author__ = 'Christoph Wehmeyer'
 __email__ = 'christoph.wehmeyer@fu-berlin.de'
 
-from .mdshare import load, catalogue, search
+from .mdshare import fetch, load, catalogue, search

@@ -37,7 +37,7 @@ def download_file(repository, remote_filename, local_path=None):
         filename=local_path)
     return filename
 
-def attempted_download(
+def attempt_to_download_file(
         repository, remote_filename, local_path=None,
         max_attempts=3, delay=3, blur=0.1):
     '''Retry to download a file several times if necessary.
@@ -71,11 +71,36 @@ def attempted_download(
     raise RuntimeError(
         'could not download file: ' + str(repository + remote_filename))
 
+def download_wrapper(
+        remote_filename, working_directory='.',
+        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
+        max_attempts=3, delay=3, blur=0.1):
+    '''Download a file if necessary.
+
+    Arguments:
+        remote_filename (str): name of the file in the repository
+        working_directory (str): directory where the file should be saved
+        repository (str): URL of the remote source directory
+        max_attempts (int): number of download attempts
+        delay (int): delay between attempts in seconds
+        blur (float): degree of blur to randomize the delay
+    '''
+    if working_directory is None:
+        local_path = None
+    else:
+        os.makedirs(working_directory, exist_ok=True)
+        local_path = os.path.join(working_directory, remote_filename)
+    if local_path is not None and os.path.exists(local_path):
+        return local_path
+    return attempt_to_download_file(
+        repository, remote_filename, local_path=local_path,
+        max_attempts=max_attempts, delay=delay, blur=blur)
+
 def load(
         remote_filename, working_directory='.', local_filename=None,
         repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
         max_attempts=3, delay=3, blur=0.1):
-    '''Download a file if it is necessary.
+    '''Download a file if it is necessary (DEPRECATED).
 
     Arguments:
         remote_filename (str): name of the file in the repository
@@ -99,9 +124,34 @@ def load(
         local_path = os.path.join(working_directory, local_filename)
     if local_path is not None and os.path.exists(local_path):
         return local_path
-    return attempted_download(
+    return attempt_to_download_file(
         repository, remote_filename, local_path=local_path,
         max_attempts=max_attempts, delay=delay, blur=blur)
+
+def fetch(
+        filename_pattern, working_directory='.',
+        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
+        max_attempts=3, delay=3, blur=0.1):
+    '''Download one or more file(s) if necessary.
+
+    Arguments:
+        filename_pattern (str): name of the file(s) in the repository
+        working_directory (str): directory where the file(s) should be saved
+        repository (str): URL of the remote source directory
+        max_attempts (int): number of download attempts
+        delay (int): delay between attempts in seconds
+        blur (float): degree of blur to randomize the delay
+    '''
+    files = search(filename_pattern, repository=repository)
+    if len(files) == 0:
+        url = '%s/%s' % (repository, filename_pattern)
+        print('File not found: ' + url)
+        raise HTTPError(url, 404, 'File(s) not found', None, None)
+    return [
+        download_wrapper(
+            remote_filename, working_directory=working_directory,
+            repository=repository, max_attempts=max_attempts,
+            delay=delay, blur=blur) for remote_filename in files]
 
 def get_available_files_dict(repository):
     # Login to the FTP and get available files
@@ -111,7 +161,8 @@ def get_available_files_dict(repository):
     for idir in repository[1:]:
         iftp.cwd(idir)
     # Get the ls -l output
-    available_files = {tup[0]:tup[1] for tup in iftp.mlsd() if tup[0] not in ['.','..']}
+    available_files = {tup[0]:tup[1] for tup in iftp.mlsd()
+                       if tup[0] not in ['.', '..']}
     iftp.close()
     return available_files
 
@@ -121,7 +172,8 @@ def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
     Arguments:
         repository (str): address of the FTP server
     '''
-    avail_files =  get_available_files_dict(repository.lstrip('http://').split('/'))
+    avail_files =  get_available_files_dict(
+        repository.lstrip('http://').split('/'))
     for key, value in sorted(avail_files.items()):
         print('%-060s %s' % (key, format_size(int(value["size"]))))
 
@@ -134,5 +186,7 @@ def search(
         filname_pattern (str): filename pattern, allows for Unix shell-style wildcards
         repository (str): address of the FTP server
     '''
-    avail_files =  get_available_files_dict(repository.lstrip('http://').split('/'))
-    return [key for key in sorted(avail_files.keys()) if fnmatch(key, filename_pattern)]
+    avail_files =  get_available_files_dict(
+        repository.lstrip('http://').split('/'))
+    return [key for key in sorted(avail_files.keys())
+            if fnmatch(key, filename_pattern)]
