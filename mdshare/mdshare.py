@@ -175,7 +175,7 @@ def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
     avail_files =  get_available_files_dict(
         repository.lstrip('http://').split('/'))
     for key, value in sorted(avail_files.items()):
-        print('%-060s %s' % (key, format_size(int(value["size"]))))
+        print('%-060s %s' % (key, format_size(int(value['size']))))
 
 def search(
         filename_pattern,
