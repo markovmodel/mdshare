@@ -11,14 +11,14 @@ This code will download a file (if it does not already exist locally) with a fea
 import mdshare
 import numpy as np
 
-local_filename = mdshare.load('alanine-dipeptide-3x250ns-backbone-dihedrals.npz')
+local_filename = mdshare.fetch('alanine-dipeptide-3x250ns-backbone-dihedrals.npz')
 with np.load(local_filename) as fh:
     trajs = [fh[key] for key in fh.keys()]
 ```
 
-By default, the ``mdshare.load()`` function will look in and download to the current directory (function parameter ``working_directory='.'``). If you instead set this parameter to ``None``,
+By default, the ``mdshare.fetch()`` function will look in and download to the current directory (function parameter ``working_directory='.'``). If you instead set this parameter to ``None``,
 ```python
-local_filename = mdshare.load(
+local_filename = mdshare.fetch(
     'alanine-dipeptide-3x250ns-backbone-dihedrals.npz',
     working_directory=None)
 ```
