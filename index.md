@@ -16,7 +16,15 @@ This website provides an overview which data is available.
 -  [Alanine dipeptide](ALA2#alanine-dipeptide)
 
 ## Downloader installation
+
+```bash
+conda install mdshare -c conda-forge
+```
+
+or
+
 ```bash
 pip install mdshare
 ```
+
 See the [github repository](https://github.com/markovmodel/mdshare) for additional information.
