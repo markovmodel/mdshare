@@ -16,15 +16,15 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import errno
 import warnings
-from urllib.request import urlretrieve
+from urllib.request import urlretrieve, urlopen
 from urllib.error import HTTPError
-from ftplib import FTP
+
 from humanfriendly import format_size
 from fnmatch import fnmatch
 
-def download_file(repository, remote_filename, local_path=None):
+
+def download_file(repository, remote_filename, local_path=None, callback=None):
     '''Download a file.
 
     Arguments:
@@ -34,12 +34,13 @@ def download_file(repository, remote_filename, local_path=None):
     '''
     filename, message = urlretrieve(
         repository + remote_filename,
-        filename=local_path)
+        filename=local_path, reporthook=callback)
     return filename
+
 
 def attempt_to_download_file(
         repository, remote_filename, local_path=None,
-        max_attempts=3, delay=3, blur=0.1):
+        max_attempts=3, delay=3, blur=0.1, callback=None):
     '''Retry to download a file several times if necessary.
 
     Arguments:
@@ -55,7 +56,7 @@ def attempt_to_download_file(
         attempt += 1
         try:
             filename = download_file(
-                repository, remote_filename, local_path=local_path)
+                repository, remote_filename, local_path=local_path, callback=callback)
         except HTTPError as e:
             if e.code == 404:
                 print('File not found: ' + e.url)
@@ -71,10 +72,11 @@ def attempt_to_download_file(
     raise RuntimeError(
         'could not download file: ' + str(repository + remote_filename))
 
+
 def download_wrapper(
         remote_filename, working_directory='.',
         repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
-        max_attempts=3, delay=3, blur=0.1):
+        max_attempts=3, delay=3, blur=0.1, callback=None):
     '''Download a file if necessary.
 
     Arguments:
@@ -94,7 +96,8 @@ def download_wrapper(
         return local_path
     return attempt_to_download_file(
         repository, remote_filename, local_path=local_path,
-        max_attempts=max_attempts, delay=delay, blur=blur)
+        max_attempts=max_attempts, delay=delay, blur=blur, callback=callback)
+
 
 def load(
         remote_filename, working_directory='.', local_filename=None,
@@ -131,7 +134,7 @@ def load(
 def fetch(
         filename_pattern, working_directory='.',
         repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
-        max_attempts=3, delay=3, blur=0.1):
+        max_attempts=3, delay=3, blur=0.1, callback=None):
     '''Download one or more file(s) if necessary.
 
     Arguments:
@@ -151,23 +154,61 @@ def fetch(
         download_wrapper(
             remote_filename, working_directory=working_directory,
             repository=repository, max_attempts=max_attempts,
-            delay=delay, blur=blur) for remote_filename in files]
+            delay=delay, blur=blur, callback=callback) for remote_filename in files]
     if len(result) == 1:
         return result[0]
     return result
 
+
+def _cache(func):
+    from functools import wraps
+    cache = {}
+    @wraps(func)
+    def f(url):
+        if url in cache:
+            result = cache[url]
+        else:
+            result = func(url)
+            cache[url] = result
+        return result
+
+    return f
+
+
+@_cache
 def get_available_files_dict(repository):
-    # Login to the FTP and get available files
-    iftp = FTP(repository[0])
-    iftp.login()
-    # Go to subdirectories
-    for idir in repository[1:]:
-        iftp.cwd(idir)
-    # Get the ls -l output
-    available_files = {tup[0]:tup[1] for tup in iftp.mlsd()
-                       if tup[0] not in ['.', '..']}
-    iftp.close()
+    from html.parser import HTMLParser
+    from collections import defaultdict
+
+    site = urlopen(repository)
+    data = site.read()
+    site.close()
+    available_files = defaultdict(dict)
+
+    class GetLinksParser(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            if tag == 'a' and len(attrs) >= 1 and attrs[0][0] =='href':
+                fname = attrs[0][1]
+                if not fname.startswith('?'):
+                    available_files[fname].clear()
+    p = GetLinksParser()
+    p.feed(data.decode())
+
+    invalid = []
+    for file in available_files:
+        f_url = repository + '/' + file
+        try:
+            site = urlopen(f_url)
+            meta = site.info()
+            site.close()
+            s = int(meta .get("Content-Length"))
+            available_files[file]['size'] = s
+        except HTTPError:
+            invalid.append(file)
+    for f in invalid:
+        available_files.pop(f)
     return available_files
+
 
 def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
     '''Prints a human-friendly list of availaible files/sizes.
@@ -175,10 +216,9 @@ def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
     Arguments:
         repository (str): address of the FTP server
     '''
-    avail_files =  get_available_files_dict(
-        repository.lstrip('http://').split('/'))
+    avail_files =  get_available_files_dict(repository)
     for key, value in sorted(avail_files.items()):
-        print('%-060s %s' % (key, format_size(int(value['size']))))
+        print('%-060s %s' % (key, format_size(value['size'])))
 
 def search(
         filename_pattern,
@@ -189,7 +229,6 @@ def search(
         filname_pattern (str): filename pattern, allows for Unix shell-style wildcards
         repository (str): address of the FTP server
     '''
-    avail_files =  get_available_files_dict(
-        repository.lstrip('http://').split('/'))
+    avail_files =  get_available_files_dict(repository)
     return [key for key in sorted(avail_files.keys())
             if fnmatch(key, filename_pattern)]
