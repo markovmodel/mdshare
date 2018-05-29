@@ -23,6 +23,7 @@ from humanfriendly import format_size
 from fnmatch import fnmatch
 from html.parser import HTMLParser
 from collections import defaultdict
+from functools import wraps
 
 
 def download_file(repository, remote_filename, local_path=None, callback=None):
@@ -163,7 +164,6 @@ def fetch(
 
 
 def _cache(func):
-    from functools import wraps
     cache = {}
     @wraps(func)
     def f(url):
@@ -178,6 +178,11 @@ def _cache(func):
 
 @_cache
 def get_available_files_dict(repository):
+    '''Obtains a dictionary of available files/sizes.
+
+    Arguments:
+        repository (str): address of the FTP server
+    '''
     site = urlopen(repository)
     data = site.read()
     site.close()
@@ -207,7 +212,7 @@ def get_available_files_dict(repository):
 
 
 def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
-    '''Prints a human-friendly list of availaible files/sizes.
+    '''Prints a human-friendly list of available files/sizes.
 
     Arguments:
         repository (str): address of the FTP server
