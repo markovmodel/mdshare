@@ -19,9 +19,11 @@ import os
 import warnings
 from urllib.request import urlretrieve, urlopen
 from urllib.error import HTTPError
-
 from humanfriendly import format_size
 from fnmatch import fnmatch
+from html.parser import HTMLParser
+from collections import defaultdict
+from functools import wraps
 
 
 def download_file(repository, remote_filename, local_path=None, callback=None):
@@ -131,6 +133,7 @@ def load(
         repository, remote_filename, local_path=local_path,
         max_attempts=max_attempts, delay=delay, blur=blur)
 
+
 def fetch(
         filename_pattern, working_directory='.',
         repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
@@ -161,7 +164,6 @@ def fetch(
 
 
 def _cache(func):
-    from functools import wraps
     cache = {}
     @wraps(func)
     def f(url):
@@ -171,20 +173,20 @@ def _cache(func):
             result = func(url)
             cache[url] = result
         return result
-
     return f
 
 
 @_cache
 def get_available_files_dict(repository):
-    from html.parser import HTMLParser
-    from collections import defaultdict
+    '''Obtains a dictionary of available files/sizes.
 
+    Arguments:
+        repository (str): address of the FTP server
+    '''
     site = urlopen(repository)
     data = site.read()
     site.close()
     available_files = defaultdict(dict)
-
     class GetLinksParser(HTMLParser):
         def handle_starttag(self, tag, attrs):
             if tag == 'a' and len(attrs) >= 1 and attrs[0][0] =='href':
@@ -193,7 +195,6 @@ def get_available_files_dict(repository):
                     available_files[fname].clear()
     p = GetLinksParser()
     p.feed(data.decode())
-
     invalid = []
     for file in available_files:
         f_url = repository + '/' + file
@@ -211,7 +212,7 @@ def get_available_files_dict(repository):
 
 
 def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
-    '''Prints a human-friendly list of availaible files/sizes.
+    '''Prints a human-friendly list of available files/sizes.
 
     Arguments:
         repository (str): address of the FTP server
@@ -219,6 +220,7 @@ def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
     avail_files =  get_available_files_dict(repository)
     for key, value in sorted(avail_files.items()):
         print('%-060s %s' % (key, format_size(value['size'])))
+
 
 def search(
         filename_pattern,
