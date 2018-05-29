@@ -7,7 +7,7 @@
 - switching to LGPL
 - adding tests and CI
 
-### 0.2.1
+#### 0.2.1
 - removing numpy dependency
 - code cleanup
 
@@ -16,5 +16,8 @@
 - deprecates `mdshare.load()`
 - provides `mdshare.fetch()` as successor to `mdshare.load()`
 
-### 0.3.1
+#### 0.3.1
 - updates to documention and package
+
+#### 0.3.2
+- replaces FTP usage
