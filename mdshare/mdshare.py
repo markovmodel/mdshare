@@ -27,13 +27,13 @@ from functools import wraps
 
 
 def download_file(repository, remote_filename, local_path=None, callback=None):
-    '''Download a file.
+    """Download a file.
 
     Arguments:
         repository (str): URL of the remote source directory
         remote_filename (str): name of the file in the repository
         local_filename (str): local path where the file should be saved
-    '''
+    """
     filename, message = urlretrieve(
         repository + remote_filename,
         filename=local_path, reporthook=callback)
@@ -43,7 +43,7 @@ def download_file(repository, remote_filename, local_path=None, callback=None):
 def attempt_to_download_file(
         repository, remote_filename, local_path=None,
         max_attempts=3, delay=3, blur=0.1, callback=None):
-    '''Retry to download a file several times if necessary.
+    """Retry to download a file several times if necessary.
 
     Arguments:
         repository (str): URL of the remote source directory
@@ -52,7 +52,7 @@ def attempt_to_download_file(
         max_attempts (int): number of download attempts
         delay (int): delay between attempts in seconds
         blur (float): degree of blur to randomize the delay
-    '''
+    """
     attempt = 0
     while attempt < max_attempts:
         attempt += 1
@@ -78,8 +78,8 @@ def attempt_to_download_file(
 def download_wrapper(
         remote_filename, working_directory='.',
         repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
-        max_attempts=3, delay=3, blur=0.1, callback=None):
-    '''Download a file if necessary.
+        max_attempts=3, delay=3, blur=0.1, callbacks=None):
+    """Download a file if necessary.
 
     Arguments:
         remote_filename (str): name of the file in the repository
@@ -88,7 +88,7 @@ def download_wrapper(
         max_attempts (int): number of download attempts
         delay (int): delay between attempts in seconds
         blur (float): degree of blur to randomize the delay
-    '''
+    """
     if working_directory is None:
         local_path = None
     else:
@@ -98,14 +98,14 @@ def download_wrapper(
         return local_path
     return attempt_to_download_file(
         repository, remote_filename, local_path=local_path,
-        max_attempts=max_attempts, delay=delay, blur=blur, callback=callback)
+        max_attempts=max_attempts, delay=delay, blur=blur, callback=callbacks)
 
 
 def load(
         remote_filename, working_directory='.', local_filename=None,
         repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
         max_attempts=3, delay=3, blur=0.1):
-    '''Download a file if it is necessary (DEPRECATED).
+    """Download a file if it is necessary (DEPRECATED).
 
     Arguments:
         remote_filename (str): name of the file in the repository
@@ -115,7 +115,7 @@ def load(
         max_attempts (int): number of download attempts
         delay (int): delay between attempts in seconds
         blur (float): degree of blur to randomize the delay
-    '''
+    """
     warnings.warn(
         'load() is deprecated, use fetch() instead',
         DeprecationWarning,
@@ -137,8 +137,8 @@ def load(
 def fetch(
         filename_pattern, working_directory='.',
         repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
-        max_attempts=3, delay=3, blur=0.1, callback=None):
-    '''Download one or more file(s) if necessary.
+        max_attempts=3, delay=3, blur=0.1, callbacks=None, show_progress=True):
+    """Download one or more file(s) if necessary.
 
     Arguments:
         filename_pattern (str): name of the file(s) in the repository
@@ -147,17 +147,56 @@ def fetch(
         max_attempts (int): number of download attempts
         delay (int): delay between attempts in seconds
         blur (float): degree of blur to randomize the delay
-    '''
-    files = search(filename_pattern, repository=repository)
+    """
+    try:
+        from tqdm import tqdm
+        have_tqdm = True
+    except ImportError:
+        have_tqdm = False
+    files = search(filename_pattern, repository=repository, return_sizes=show_progress and have_tqdm)
+
     if len(files) == 0:
         url = '%s/%s' % (repository, filename_pattern)
         print('File not found: ' + url)
         raise HTTPError(url, 404, 'File(s) not found', None, None)
+
+    if have_tqdm and show_progress:
+        callbacks = []
+
+        class wrapper(object):
+            def __init__(self, filename, size):
+                self.t = tqdm(unit='B',
+                              desc='downloading {}'.format(filename),
+                              total=size,
+                              unit_scale=True,
+                              unit_divisor=1024,
+                              )
+
+            def __call__(self, n, block_size, total):
+                downloaded = n * block_size
+                #print(downloaded, total)
+                self.t.update(max(0, downloaded - self.t.n))
+                if downloaded >= total:
+                    increment = int(self.t.total - self.t.n)
+                    if increment > 0:
+                        self.t.update(increment)
+                    self.t.refresh(nolock=True)
+
+        for f, size in files:
+            path = os.path.join(working_directory, f)
+            if os.path.exists(path):
+                callbacks.append(None)
+            else:
+                callbacks.append(wrapper(path, size))
+        files = [f for f, size in files]
+    else:
+        callbacks = [None] * len(files)
+
     result = [
         download_wrapper(
             remote_filename, working_directory=working_directory,
             repository=repository, max_attempts=max_attempts,
-            delay=delay, blur=blur, callback=callback) for remote_filename in files]
+            delay=delay, blur=blur, callbacks=progress) for remote_filename, progress in zip(files, callbacks)]
     if len(result) == 1:
         return result[0]
     return result
@@ -178,11 +217,11 @@ def _cache(func):
 
 @_cache
 def get_available_files_dict(repository):
-    '''Obtains a dictionary of available files/sizes.
+    """Obtains a dictionary of available files/sizes.
 
     Arguments:
         repository (str): address of the FTP server
-    '''
+    """
     site = urlopen(repository)
     data = site.read()
     site.close()
@@ -212,11 +251,11 @@ def get_available_files_dict(repository):
 
 
 def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
-    '''Prints a human-friendly list of available files/sizes.
+    """Prints a human-friendly list of available files/sizes.
 
     Arguments:
         repository (str): address of the FTP server
-    '''
+    """
     avail_files =  get_available_files_dict(repository)
     for key, value in sorted(avail_files.items()):
         print('%-060s %s' % (key, format_size(value['size'])))
@@ -224,13 +263,16 @@ def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
 
 def search(
         filename_pattern,
-        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
-    '''Returns a list of available files matching a filename_pattern.
+        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/', return_sizes=False):
+    """Returns a list of available files matching a filename_pattern.
 
     Arguments:
         filname_pattern (str): filename pattern, allows for Unix shell-style wildcards
         repository (str): address of the FTP server
-    '''
-    avail_files =  get_available_files_dict(repository)
+    """
+    avail_files = get_available_files_dict(repository)
+    if return_sizes:
+        return [(key, avail_files[key]['size']) for key in sorted(avail_files.keys())
+                if fnmatch(key, filename_pattern)]
     return [key for key in sorted(avail_files.keys())
             if fnmatch(key, filename_pattern)]
