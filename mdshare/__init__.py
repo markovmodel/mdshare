@@ -26,4 +26,8 @@ __author__ = 'Christoph Wehmeyer'
 __email__ = 'christoph.wehmeyer@fu-berlin.de'
 __credits__ = ['Guillermo Pérez-Hernández', 'Martin K. Scherer'],
 
-from .mdshare import fetch, load, catalogue, search
+from .mdshare import fetch, catalogue, search
+
+
+def load(*args, **kwargs):
+    raise NotImplementedError('use fetch')

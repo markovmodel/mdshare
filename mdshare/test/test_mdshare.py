@@ -15,7 +15,7 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .. import fetch, load, catalogue, search
+from .. import fetch, catalogue, search
 import os
 import pytest
 from urllib.error import HTTPError
@@ -28,23 +28,6 @@ def examine_test_file(path, offset=0):
         assert float(fh.readline()) == 3.0 + offset
     os.remove(path)
 
-def test_load_npz_file_local():
-    print('local')
-    examine_test_file(load('mdshare-test-00.txt'))
-
-def test_load_npz_file_temp():
-    examine_test_file(load(
-        'mdshare-test-00.txt', working_directory=None))
-
-def test_load_npz_file_local_newname():
-    examine_test_file(load(
-        'mdshare-test-00.txt', local_filename='testfile.txt'))
-
-def test_load_npz_file_temp_newname():
-    examine_test_file(load(
-        'mdshare-test-00.txt',
-        working_directory=None,
-        local_filename='testfile.txt'))
 
 def test_fetch_npz_file_local():
     print('fetch npz file')
@@ -53,17 +36,21 @@ def test_fetch_npz_file_local():
             fetch('mdshare-test-%02d.txt' % offset),
             offset=offset)
 
+
 def test_fetch_npz_file_temp():
     files = fetch('mdshare-test-??.txt', working_directory=None)
     for offset, file in enumerate(files):
         examine_test_file(file, offset=offset)
 
+
 def test_fetch_nonexistent_url():
     with pytest.raises(HTTPError):
         fetch('non-existent-file-on-the-ftp-server')
 
+
 def test_catalogue():
     catalogue()
+
 
 def test_search():
     assert 'mdshare-test-00.txt' in search('mdshare-test-??.txt')

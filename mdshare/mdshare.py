@@ -18,6 +18,7 @@
 import os
 import sys
 import warnings
+import requests
 
 from urllib.error import HTTPError
 from humanfriendly import format_size
@@ -28,24 +29,14 @@ from functools import wraps
 
 
 DEFAULT_REPOSITORY = 'http://ftp.imp.fu-berlin.de/pub/cmb-data/'
-TIMEOUT = 15
 _connection = None
-_path = None
 
 
-def _get_connection(repository):
-    from  http.client import HTTPConnection
-    global _connection, _path
+def _get_connection():
+    global _connection
     if _connection is None:
-        import re
-        matches = re.match('(https?://)([^:^/]*)(:\\d*)?(.*)?', repository)
-        assert matches
-        assert matches.group(1) == 'http://', 'only http implemented, but given was %s' % matches.group(0)
-        server = matches.group(2)
-        port = matches.group(3)
-        _path = matches.group(4)
-        _connection = HTTPConnection(server, port=80 if port is None else port, timeout=TIMEOUT)
-    return _connection, _path
+        _connection = requests.session()
+    return _connection
 
 
 def _download_file(repository, remote_filename, local_path=None, callback=None):
@@ -56,11 +47,8 @@ def _download_file(repository, remote_filename, local_path=None, callback=None):
         remote_filename (str): name of the file in the repository
         local_filename (str): local path where the file should be saved
     """
-    conn, path = _get_connection(repository)
-    conn.request('GET', path + remote_filename)
-    response = conn.getresponse()
-    if response.code == 404:
-        raise
+    conn = _get_connection()
+    r = conn.get(repository + remote_filename, stream=True)
 
     if local_path is None:
         import tempfile
@@ -68,12 +56,8 @@ def _download_file(repository, remote_filename, local_path=None, callback=None):
 
     blocksize = 1024*8
     i = 0
-    # TODO: check size and total read!
     with open(local_path, 'wb') as fh:
-        while True:
-            data = response.read(blocksize)
-            if not data:
-                break
+        for data in r.iter_content(blocksize):
             fh.write(data)
             if callback:
                 callback(i, blocksize)
@@ -147,39 +131,6 @@ def _download_wrapper(
         max_attempts=max_attempts, callback=callbacks)
 
 
-def load(
-        remote_filename, working_directory='.', local_filename=None,
-        repository=DEFAULT_REPOSITORY,
-        max_attempts=3, delay=3, blur=0.1):
-    """Download a file if it is necessary (DEPRECATED).
-
-    Arguments:
-        remote_filename (str): name of the file in the repository
-        working_directory (str): directory where the file should be saved
-        local_filename (str): name under which the file should be saved
-        repository (str): URL of the remote source directory
-        max_attempts (int): number of download attempts
-        delay (int): delay between attempts in seconds
-        blur (float): degree of blur to randomize the delay
-    """
-    warnings.warn(
-        'load() is deprecated, use fetch() instead',
-        DeprecationWarning,
-        stacklevel=2)
-    if working_directory is None:
-        local_path = None
-    else:
-        os.makedirs(working_directory, exist_ok=True)
-        if local_filename is None:
-            local_filename = remote_filename
-        local_path = os.path.join(working_directory, local_filename)
-    if local_path is not None and os.path.exists(local_path):
-        return local_path
-    return _attempt_to_download_file(
-        repository, remote_filename, local_path=local_path,
-        max_attempts=max_attempts)
-
-
 def fetch(
         filename_pattern, working_directory='.',
         repository=DEFAULT_REPOSITORY,
@@ -247,6 +198,7 @@ def fetch(
     return result
 
 
+# TODO: consider a TTL pattern here.
 def _cache(func):
     cache = {}
     @wraps(func)
@@ -267,10 +219,9 @@ def _get_available_files_dict(repository):
     Arguments:
         repository (str): address of the FTP server
     """
-    conn, path = _get_connection(repository)
-    conn.request('GET', path)
-    response = conn.getresponse()
-    data = response.read()
+    conn = _get_connection()
+    response = conn.get(repository, timeout=10)
+    data = response.content
     response.close()
     available_files = defaultdict(dict)
     class GetLinksParser(HTMLParser):
@@ -281,44 +232,19 @@ def _get_available_files_dict(repository):
                     available_files[fname].clear()
     p = GetLinksParser()
     p.feed(data.decode())
-    del data
-    invalid = []
-    import http
-    from pprint import pprint
-    t_total = 0
-    for file in available_files:
-        f_url = repository + '/' + file
-        try:
-            #site = urlopen(f_url)
-            #meta = site.info()
-            #site.close()
+    del data, p
 
-            #conn.set_debuglevel(10)
-            hdrs = {'Host': 'ftp.imp.fu-berlin.de', 'User-Agent': 'Python-urllib/3.6', 'Connection': 'close'}
-            import time
-            start = time.time()
-            conn.request('GET', path + '/' + file, headers=hdrs, encode_chunked=False)
-            response = conn.getresponse()
-            stop = time.time()
-            d = stop - start
-            t_total += d
+    invalid = []
+    for file in available_files:
+        try:
+            response = conn.head(repository + file)
             s = int(response.headers.get('Content-Length', 0))
-            #pprint(headers)
             response.close()
-            #if 'Content-Length' in headers:
-            #    s = int(headers['Content-Length'])
-            #else:
-            #    s = 0
-            #s = int(meta.get("Content-Length"))
             available_files[file]['size'] = s
         except HTTPError:
             invalid.append(file)
-        except http.client.BadStatusLine:
-            invalid.append(file)
     for f in invalid:
         available_files.pop(f)
-    #pprint(available_files)
-    print('t:', t_total)
 
     return available_files
 
