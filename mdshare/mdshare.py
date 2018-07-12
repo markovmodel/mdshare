@@ -16,8 +16,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import warnings
-from urllib.request import urlretrieve, urlopen
+
 from urllib.error import HTTPError
 from humanfriendly import format_size
 from fnmatch import fnmatch
@@ -27,9 +28,27 @@ from functools import wraps
 
 
 DEFAULT_REPOSITORY = 'http://ftp.imp.fu-berlin.de/pub/cmb-data/'
+TIMEOUT = 15
+_connection = None
+_path = None
 
 
-def download_file(repository, remote_filename, local_path=None, callback=None):
+def _get_connection(repository):
+    from  http.client import HTTPConnection
+    global _connection, _path
+    if _connection is None:
+        import re
+        matches = re.match('(https?://)([^:^/]*)(:\\d*)?(.*)?', repository)
+        assert matches
+        assert matches.group(1) == 'http://', 'only http implemented, but given was %s' % matches.group(0)
+        server = matches.group(2)
+        port = matches.group(3)
+        _path = matches.group(4)
+        _connection = HTTPConnection(server, port=80 if port is None else port, timeout=TIMEOUT)
+    return _connection, _path
+
+
+def _download_file(repository, remote_filename, local_path=None, callback=None):
     """Download a file.
 
     Arguments:
@@ -37,15 +56,35 @@ def download_file(repository, remote_filename, local_path=None, callback=None):
         remote_filename (str): name of the file in the repository
         local_filename (str): local path where the file should be saved
     """
-    filename, message = urlretrieve(
-        repository + remote_filename,
-        filename=local_path, reporthook=callback)
-    return filename
+    conn, path = _get_connection(repository)
+    conn.request('GET', path + remote_filename)
+    response = conn.getresponse()
+    if response.code == 404:
+        raise
+
+    if local_path is None:
+        import tempfile
+        local_path = tempfile.mktemp()
+
+    blocksize = 1024*8
+    i = 0
+    # TODO: check size and total read!
+    with open(local_path, 'wb') as fh:
+        while True:
+            data = response.read(blocksize)
+            if not data:
+                break
+            fh.write(data)
+            if callback:
+                callback(i, blocksize)
+            i += 1
+
+    return local_path
 
 
-def attempt_to_download_file(
+def _attempt_to_download_file(
         repository, remote_filename, local_path=None,
-        max_attempts=3, delay=3, blur=0.1, callback=None):
+        max_attempts=3, callback=None):
     """Retry to download a file several times if necessary.
 
     Arguments:
@@ -53,35 +92,41 @@ def attempt_to_download_file(
         remote_filename (str): name of the file in the repository
         local_filename (str): local path where the file should be saved
         max_attempts (int): number of download attempts
-        delay (int): delay between attempts in seconds
-        blur (float): degree of blur to randomize the delay
     """
     attempt = 0
+    filename = None
+    def fault_handler(exception):
+        print(exception)
+        try:
+            # remove faulty files
+            os.unlink(filename)
+        except:
+            pass
+        raise exception
+
     while attempt < max_attempts:
         attempt += 1
         try:
-            filename = download_file(
+            filename = _download_file(
                 repository, remote_filename, local_path=local_path, callback=callback)
+            break
         except HTTPError as e:
             if e.code == 404:
                 print('File not found: ' + e.url)
                 raise
             else:
                 print(e)
-        except IOError as e:
-            print(e)
-        try:
-            return filename
-        except UnboundLocalError:
-            pass
-    raise RuntimeError(
-        'could not download file: ' + str(repository + remote_filename))
+        except (IOError, KeyboardInterrupt) as e:
+            fault_handler(e)
+    if filename is None:
+        raise RuntimeError('could not download file: {repo}{fn}'.format(repo=repository, fn=remote_filename))
+    return filename
 
 
-def download_wrapper(
+def _download_wrapper(
         remote_filename, working_directory='.',
         repository=DEFAULT_REPOSITORY,
-        max_attempts=3, delay=3, blur=0.1, callbacks=None):
+        max_attempts=3, callbacks=None):
     """Download a file if necessary.
 
     Arguments:
@@ -89,8 +134,6 @@ def download_wrapper(
         working_directory (str): directory where the file should be saved
         repository (str): URL of the remote source directory
         max_attempts (int): number of download attempts
-        delay (int): delay between attempts in seconds
-        blur (float): degree of blur to randomize the delay
     """
     if working_directory is None:
         local_path = None
@@ -99,9 +142,9 @@ def download_wrapper(
         local_path = os.path.join(working_directory, remote_filename)
     if local_path is not None and os.path.exists(local_path):
         return local_path
-    return attempt_to_download_file(
+    return _attempt_to_download_file(
         repository, remote_filename, local_path=local_path,
-        max_attempts=max_attempts, delay=delay, blur=blur, callback=callbacks)
+        max_attempts=max_attempts, callback=callbacks)
 
 
 def load(
@@ -132,15 +175,15 @@ def load(
         local_path = os.path.join(working_directory, local_filename)
     if local_path is not None and os.path.exists(local_path):
         return local_path
-    return attempt_to_download_file(
+    return _attempt_to_download_file(
         repository, remote_filename, local_path=local_path,
-        max_attempts=max_attempts, delay=delay, blur=blur)
+        max_attempts=max_attempts)
 
 
 def fetch(
         filename_pattern, working_directory='.',
         repository=DEFAULT_REPOSITORY,
-        max_attempts=3, delay=3, blur=0.1, callbacks=None, show_progress=True):
+        max_attempts=3, delay=3, blur=0.1, show_progress=True):
     """Download one or more file(s) if necessary.
 
     Arguments:
@@ -153,7 +196,6 @@ def fetch(
     """
     try:
         import progress_reporter
-        from tqdm import tqdm
         have_progress_reporter = True
     except ImportError:
         have_progress_reporter = False
@@ -166,32 +208,40 @@ def fetch(
 
     if have_progress_reporter and show_progress:
         callbacks = []
-        pg = progress_reporter.ProgressReporter()
+        pg = progress_reporter.ProgressReporter_()
 
-        def update(n, blk, total, stage):
+        total = sum(x[1] for x in files)
+        def update(n, blk, stage):
             downloaded = n * blk
             # print(downloaded, total)
             inc = max(0, downloaded - pg._prog_rep_progressbars[stage].n)
-            pg._progress_update(inc, stage=stage)
+            pg.update(inc, stage=stage)
+            # total progress
+            pg.update(max(0, total - downloaded), stage=-1)
         from functools import partial
+        tqdm_args = {'unit': 'B', 'file': sys.stdout, 'unit_scale': True}
+        pg.register(total, description='total', tqdm_args=tqdm_args, stage=-1)
         for i, (f, size) in enumerate(files):
             if working_directory is not None:
                 path = os.path.join(working_directory, f)
                 if os.path.exists(path):
                     callbacks.append(None)
                 else:
-                    pg._progress_register(size, description='downloading {}'.format(f),
-                                          tqdm_args={'unit':'B'}, stage=i)
+                    pg.register(size, description='downloading {}'.format(f),
+                                tqdm_args=tqdm_args, stage=i)
                     callbacks.append(partial(update, stage=i))
         files = [f for f, size in files]
     else:
+        from unittest.mock import MagicMock
+        pg = MagicMock()
         callbacks = [None] * len(files)
 
-    result = [
-        download_wrapper(
+    with pg.context():
+        result = [
+          _download_wrapper(
             remote_filename, working_directory=working_directory,
-            repository=repository, max_attempts=max_attempts,
-            delay=delay, blur=blur, callbacks=progress) for remote_filename, progress in zip(files, callbacks)]
+            repository=repository, max_attempts=max_attempts, callbacks=progress)
+            for remote_filename, progress in zip(files, callbacks)]
     if len(result) == 1:
         return result[0]
     return result
@@ -211,15 +261,17 @@ def _cache(func):
 
 
 @_cache
-def get_available_files_dict(repository):
+def _get_available_files_dict(repository):
     """Obtains a dictionary of available files/sizes.
 
     Arguments:
         repository (str): address of the FTP server
     """
-    site = urlopen(repository)
-    data = site.read()
-    site.close()
+    conn, path = _get_connection(repository)
+    conn.request('GET', path)
+    response = conn.getresponse()
+    data = response.read()
+    response.close()
     available_files = defaultdict(dict)
     class GetLinksParser(HTMLParser):
         def handle_starttag(self, tag, attrs):
@@ -229,19 +281,45 @@ def get_available_files_dict(repository):
                     available_files[fname].clear()
     p = GetLinksParser()
     p.feed(data.decode())
+    del data
     invalid = []
+    import http
+    from pprint import pprint
+    t_total = 0
     for file in available_files:
         f_url = repository + '/' + file
         try:
-            site = urlopen(f_url)
-            meta = site.info()
-            site.close()
-            s = int(meta .get("Content-Length"))
+            #site = urlopen(f_url)
+            #meta = site.info()
+            #site.close()
+
+            #conn.set_debuglevel(10)
+            hdrs = {'Host': 'ftp.imp.fu-berlin.de', 'User-Agent': 'Python-urllib/3.6', 'Connection': 'close'}
+            import time
+            start = time.time()
+            conn.request('GET', path + '/' + file, headers=hdrs, encode_chunked=False)
+            response = conn.getresponse()
+            stop = time.time()
+            d = stop - start
+            t_total += d
+            s = int(response.headers.get('Content-Length', 0))
+            #pprint(headers)
+            response.close()
+            #if 'Content-Length' in headers:
+            #    s = int(headers['Content-Length'])
+            #else:
+            #    s = 0
+            #s = int(meta.get("Content-Length"))
             available_files[file]['size'] = s
         except HTTPError:
             invalid.append(file)
+        except http.client.BadStatusLine:
+            invalid.append(file)
     for f in invalid:
         available_files.pop(f)
+    #pprint(available_files)
+    print('t:', t_total)
+
     return available_files
 
 
@@ -251,7 +329,7 @@ def catalogue(repository=DEFAULT_REPOSITORY):
     Arguments:
         repository (str): address of the FTP server
     """
-    avail_files =  get_available_files_dict(repository)
+    avail_files =  _get_available_files_dict(repository)
     for key, value in sorted(avail_files.items()):
         print('%-060s %s' % (key, format_size(value['size'])))
 
@@ -265,7 +343,7 @@ def search(
         filname_pattern (str): filename pattern, allows for Unix shell-style wildcards
         repository (str): address of the FTP server
     """
-    avail_files = get_available_files_dict(repository)
+    avail_files = _get_available_files_dict(repository)
     if return_sizes:
         return [(key, avail_files[key]['size']) for key in sorted(avail_files.keys())
                 if fnmatch(key, filename_pattern)]

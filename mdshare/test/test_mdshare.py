@@ -29,6 +29,7 @@ def examine_test_file(path, offset=0):
     os.remove(path)
 
 def test_load_npz_file_local():
+    print('local')
     examine_test_file(load('mdshare-test-00.txt'))
 
 def test_load_npz_file_temp():
@@ -45,11 +46,8 @@ def test_load_npz_file_temp_newname():
         working_directory=None,
         local_filename='testfile.txt'))
 
-def test_load_nonexistent_url():
-    with pytest.raises(HTTPError):
-        load('non-existent-file-on-the-ftp-server')
-
 def test_fetch_npz_file_local():
+    print('fetch npz file')
     for offset in range(2):
         examine_test_file(
             fetch('mdshare-test-%02d.txt' % offset),
