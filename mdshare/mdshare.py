@@ -17,16 +17,15 @@
 
 import os
 import sys
-import warnings
 import requests
 
-from urllib.error import HTTPError
 from humanfriendly import format_size
 from fnmatch import fnmatch
 from html.parser import HTMLParser
 from collections import defaultdict
 from functools import wraps
 
+from requests import HTTPError
 
 DEFAULT_REPOSITORY = 'http://ftp.imp.fu-berlin.de/pub/cmb-data/'
 _connection = None
@@ -80,7 +79,7 @@ def _attempt_to_download_file(
     attempt = 0
     filename = None
     def fault_handler(exception):
-        print(exception)
+        print('error:', exception, file=sys.stderr)
         try:
             # remove faulty files
             os.unlink(filename)
@@ -94,13 +93,7 @@ def _attempt_to_download_file(
             filename = _download_file(
                 repository, remote_filename, local_path=local_path, callback=callback)
             break
-        except HTTPError as e:
-            if e.code == 404:
-                print('File not found: ' + e.url)
-                raise
-            else:
-                print(e)
-        except (IOError, KeyboardInterrupt) as e:
+        except (HTTPError, IOError, KeyboardInterrupt) as e:
             fault_handler(e)
     if filename is None:
         raise RuntimeError('could not download file: {repo}{fn}'.format(repo=repository, fn=remote_filename))
@@ -220,32 +213,42 @@ def _get_available_files_dict(repository):
         repository (str): address of the FTP server
     """
     conn = _get_connection()
-    response = conn.get(repository, timeout=10)
-    data = response.content
-    response.close()
-    available_files = defaultdict(dict)
-    class GetLinksParser(HTMLParser):
-        def handle_starttag(self, tag, attrs):
-            if tag == 'a' and len(attrs) >= 1 and attrs[0][0] =='href':
-                fname = attrs[0][1]
-                if not fname.startswith('?'):
-                    available_files[fname].clear()
-    p = GetLinksParser()
-    p.feed(data.decode())
-    del data, p
+    def from_web_server_generated_index():
+        response = conn.get(repository, timeout=10)
+        data = response.content
+        response.close()
+        available_files = defaultdict(dict)
+        class GetLinksParser(HTMLParser):
+            def handle_starttag(self, tag, attrs):
+                if tag == 'a' and len(attrs) >= 1 and attrs[0][0] =='href':
+                    fname = attrs[0][1]
+                    if not fname.startswith('?'):
+                        available_files[fname].clear()
+        p = GetLinksParser()
+        p.feed(data.decode())
 
-    invalid = []
-    for file in available_files:
-        try:
-            response = conn.head(repository + file)
-            s = int(response.headers.get('Content-Length', 0))
-            response.close()
-            available_files[file]['size'] = s
-        except HTTPError:
-            invalid.append(file)
-    for f in invalid:
-        available_files.pop(f)
+        invalid = []
+        for file in available_files:
+            try:
+                response = conn.head(repository + file)
+                s = int(response.headers.get('Content-Length', 0))
+                response.close()
+                available_files[file]['size'] = s
+            except HTTPError:
+                invalid.append(file)
+        for f in invalid:
+            available_files.pop(f)
+        return available_files
 
+    def from_yaml_index():
+        # TODO: impl
+        response = conn.get(repository+'/mdshare-index.yaml')
+        data = response.content
+        import yaml
+        collections = yaml.load(data.decode('utf-8'))
+        return collections['collections']
+
+    available_files = from_web_server_generated_index()
     return available_files
 
 

@@ -18,7 +18,7 @@
 from .. import fetch, catalogue, search
 import os
 import pytest
-from urllib.error import HTTPError
+
 
 def examine_test_file(path, offset=0):
     with open(path, 'r') as fh:
@@ -44,6 +44,7 @@ def test_fetch_npz_file_temp():
 
 
 def test_fetch_nonexistent_url():
+    from requests import HTTPError
     with pytest.raises(HTTPError):
         fetch('non-existent-file-on-the-ftp-server')
 
