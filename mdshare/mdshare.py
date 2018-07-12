@@ -26,6 +26,9 @@ from collections import defaultdict
 from functools import wraps
 
 
+DEFAULT_REPOSITORY = 'http://ftp.imp.fu-berlin.de/pub/cmb-data/'
+
+
 def download_file(repository, remote_filename, local_path=None, callback=None):
     """Download a file.
 
@@ -77,7 +80,7 @@ def attempt_to_download_file(
 
 def download_wrapper(
         remote_filename, working_directory='.',
-        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
+        repository=DEFAULT_REPOSITORY,
         max_attempts=3, delay=3, blur=0.1, callbacks=None):
     """Download a file if necessary.
 
@@ -103,7 +106,7 @@ def download_wrapper(
 
 def load(
         remote_filename, working_directory='.', local_filename=None,
-        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
+        repository=DEFAULT_REPOSITORY,
         max_attempts=3, delay=3, blur=0.1):
     """Download a file if it is necessary (DEPRECATED).
 
@@ -136,7 +139,7 @@ def load(
 
 def fetch(
         filename_pattern, working_directory='.',
-        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/',
+        repository=DEFAULT_REPOSITORY,
         max_attempts=3, delay=3, blur=0.1, callbacks=None, show_progress=True):
     """Download one or more file(s) if necessary.
 
@@ -149,45 +152,37 @@ def fetch(
         blur (float): degree of blur to randomize the delay
     """
     try:
+        import progress_reporter
         from tqdm import tqdm
-        have_tqdm = True
+        have_progress_reporter = True
     except ImportError:
-        have_tqdm = False
-    files = search(filename_pattern, repository=repository, return_sizes=show_progress and have_tqdm)
+        have_progress_reporter = False
+    files = search(filename_pattern, repository=repository, return_sizes=show_progress and have_progress_reporter)
 
     if len(files) == 0:
         url = '%s/%s' % (repository, filename_pattern)
         print('File not found: ' + url)
         raise HTTPError(url, 404, 'File(s) not found', None, None)
 
-    if have_tqdm and show_progress:
+    if have_progress_reporter and show_progress:
         callbacks = []
+        pg = progress_reporter.ProgressReporter()
 
-        class wrapper(object):
-            def __init__(self, filename, size):
-                self.t = tqdm(unit='B',
-                              desc='downloading {}'.format(filename),
-                              total=size,
-                              unit_scale=True,
-                              unit_divisor=1024,
-                              )
-
-            def __call__(self, n, block_size, total):
-                downloaded = n * block_size
-                #print(downloaded, total)
-                self.t.update(max(0, downloaded - self.t.n))
-                if downloaded >= total:
-                    increment = int(self.t.total - self.t.n)
-                    if increment > 0:
-                        self.t.update(increment)
-                    self.t.refresh(nolock=True)
-
-        for f, size in files:
-            path = os.path.join(working_directory, f)
-            if os.path.exists(path):
-                callbacks.append(None)
-            else:
-                callbacks.append(wrapper(path, size))
+        def update(n, blk, total, stage):
+            downloaded = n * blk
+            # print(downloaded, total)
+            inc = max(0, downloaded - pg._prog_rep_progressbars[stage].n)
+            pg._progress_update(inc, stage=stage)
+        from functools import partial
+        for i, (f, size) in enumerate(files):
+            if working_directory is not None:
+                path = os.path.join(working_directory, f)
+                if os.path.exists(path):
+                    callbacks.append(None)
+                else:
+                    pg._progress_register(size, description='downloading {}'.format(f),
+                                          tqdm_args={'unit':'B'}, stage=i)
+                    callbacks.append(partial(update, stage=i))
         files = [f for f, size in files]
     else:
         callbacks = [None] * len(files)
@@ -250,7 +245,7 @@ def get_available_files_dict(repository):
     return available_files
 
 
-def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
+def catalogue(repository=DEFAULT_REPOSITORY):
     """Prints a human-friendly list of available files/sizes.
 
     Arguments:
@@ -263,7 +258,7 @@ def catalogue(repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/'):
 
 def search(
         filename_pattern,
-        repository='http://ftp.imp.fu-berlin.de/pub/cmb-data/', return_sizes=False):
+        repository=DEFAULT_REPOSITORY, return_sizes=False):
     """Returns a list of available files matching a filename_pattern.
 
     Arguments:
