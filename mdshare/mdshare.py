@@ -161,7 +161,7 @@ def fetch(
             inc = max(0, downloaded - pg._prog_rep_progressbars[stage].n)
             pg.update(inc, stage=stage)
             # total progress
-            pg.update(max(0, total - downloaded), stage=-1)
+            pg.update(inc, stage=-1)
         from functools import partial
         tqdm_args = {'unit': 'B', 'file': sys.stdout, 'unit_scale': True}
         pg.register(total, description='total', tqdm_args=tqdm_args, stage=-1)
