@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from mdshare import fetch, Repository
 from mdshare.utils import file_hash
 from argparse import ArgumentParser
 from yaml import load, dump
@@ -50,8 +51,11 @@ def make_container(container, files):
             fh.add(file)
 
 
-def build(template):
+def build(template_file):
     """Build the catalogues from the given template"""
+    with open(template_file, 'r') as fh:
+        template = load(fh)
+
     for key in ('url', 'include', 'containers'):
         assert key in template, \
         'Cannot build without {} key'.format(key)
@@ -81,8 +85,27 @@ def build(template):
     print('checksum written to:  {}'.format(checksum))
 
 
-def test(catalogue):
-    raise NotImplementedError()
+def test(catalogue_file, checksum_file):
+    repository = Repository(catalogue_file, checksum_file)
+    working_directory = 'mdshare-testing-area'
+    os.mkdir(working_directory)
+    for file in repository.index:
+        local_file = fetch(
+            file,
+            working_directory=working_directory,
+            repository=repository)
+        os.remove(local_file)
+    for file in repository.containers:
+        local_files = fetch(
+            file,
+            working_directory=working_directory,
+            repository=repository)
+        try:
+            os.remove(local_files)
+        except TypeError:
+            for local_file in local_files:
+                os.remove(local_file)
+    os.rmdir(working_directory)
 
 
 if __name__ == '__main__':
@@ -95,14 +118,16 @@ if __name__ == '__main__':
         'yaml',
         help='yaml file with catalogue or catalogue template',
         metavar='FILE')
+    parser.add_argument(
+        'md5',
+        help='md5 checksum file of the catalogue',
+        metavar='FILE',
+        nargs='?')
     args = parser.parse_args()
 
-    with open(args.yaml, 'r') as fh:
-        yaml_file = load(fh)
-
     if args.mode.lower() == 'build':
-        build(yaml_file)
+        build(args.yaml)
     elif args.mode.lower() == 'test':
-        test(yaml_file)
+        test(args.yaml, args.md5)
     else:
         raise ValueError('Unsupported mode: {}'.format(args.mode))
