@@ -1,0 +1,28 @@
+name: mdshare-catalogue
+url: 'http://ftp.imp.fu-berlin.de/pub/cmb-data/'
+include:
+  - alanine-dipeptide-*.npz
+  - alanine-dipeptide-*-nowater.xtc
+  - alanine-dipeptide-nowater.pdb
+  - pentapeptide-*-500ns-impl-solv.xtc
+  - pentapeptide-impl-solv.pdb
+  - pyemma-tutorial-mt-data.npz
+  - pyemma-tutorial-tpt-data.npz
+  - pyemma-tutorial-us-data.npz
+  - pyemma-tutorial-us-nacl.npz
+  - methane-dimer-umbrella-sampling.npz
+  - doublewell_disconnected.npy
+  - doublewell_oneway.npy
+  - hmm-doublewell-2d-100k.npz
+  - mdshare-test-00.txt
+containers:
+  pyemma-tutorial-livecoms.tar.gz:
+    - alanine-dipeptide-*-nowater.xtc
+    - alanine-dipeptide-nowater.pdb
+    - pentapeptide-*-500ns-impl-solv.xtc
+    - pentapeptide-impl-solv.pdb
+    - doublewell_disconnected.npy
+    - doublewell_oneway.npy
+    - hmm-doublewell-2d-100k.npz
+  mdshare-test.tar.gz:
+    - mdshare-test-00.txt

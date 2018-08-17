@@ -24,6 +24,8 @@ import fnmatch
 import tarfile
 import os
 
+"""Build or test a catalogue; see mdshare/data/template for a build example"""
+
 
 def filter_files(files, patterns):
     """Keep only those files which match at least on pattern"""

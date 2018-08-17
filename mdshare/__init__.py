@@ -34,8 +34,8 @@ from os.path import dirname, join
 from warnings import warn
 try:
     default_repository = Repository(
-        join(dirname(__file__), 'mdshare-catalogue.yaml'),
-        join(dirname(__file__), 'mdshare-catalogue.md5'))
+        join(dirname(__file__), 'data', 'mdshare-catalogue.yaml'),
+        join(dirname(__file__), 'data', 'mdshare-catalogue.md5'))
 except FileNotFoundError:
     warn('Cannot build the default repository: missing file(s)!')
     default_repository = None
