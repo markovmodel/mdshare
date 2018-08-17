@@ -27,11 +27,11 @@ permalink: /ALA2/
 
 ## Contents
 ### Raw data
-PDB file and DCD files of three independent simulations.
+PDB file and XTC files of three independent simulations (super-imposed configurations).
 -  [alanine-dipeptide-nowater.pdb](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-nowater.pdb)
--  [alanine-dipeptide-0-250ns-nowater.dcd](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-0-250ns-nowater.dcd)
--  [alanine-dipeptide-1-250ns-nowater.dcd](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-1-250ns-nowater.dcd)
--  [alanine-dipeptide-2-250ns-nowater.dcd](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-2-250ns-nowater.dcd)
+-  [alanine-dipeptide-0-250ns-nowater.xtc](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-0-250ns-nowater.xtc)
+-  [alanine-dipeptide-1-250ns-nowater.xtc](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-1-250ns-nowater.xtc)
+-  [alanine-dipeptide-2-250ns-nowater.xtc](http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-2-250ns-nowater.xtc)
 
 ### Featurized data
 Each file contains three **numpy.ndarray(shape=[250000, n_features], dtype=numpy.float32)** objects (keys: **arr_0**, **arr_1**, **arr_2**) from three independent simulations.
@@ -41,6 +41,6 @@ Each file contains three **numpy.ndarray(shape=[250000, n_features], dtype=numpy
 
 ## Citations
 -  F. N&uuml;ske, *et al*: [Markov State Models from short non-Equilibrium Simulations - Analysis and Correction of Estimation Bias](http://arxiv.org/abs/1701.01665), *J. Chem. Phys.* **146** (2017), 094104.
--  C. Wehmeyer and F. No&eacute;: [Time-lagged autoencoders: Deep learning of slow collective variables for molecular kinetics](https://arxiv.org/abs/1710.11239) (2017), arXiv:1710.11239 [stat.ML]
+-  C. Wehmeyer and F. No&eacute;: [Time-lagged autoencoders: Deep learning of slow collective variables for molecular kinetics](https://doi.org/10.1063/1.5011399), *J. Chem. Phys.* **148** (2018), 241703.
 
 <div style="text-align: right"><a href="../">back</a></div>
