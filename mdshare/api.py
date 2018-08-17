@@ -20,7 +20,43 @@ import sys
 import tarfile
 from tempfile import mkdtemp
 from .utils import LoadError, download_wrapper
+from .repository import Repository
 from . import default_repository
+
+
+def load_repository(catalogue_file, checksum_file=None):
+    """Load a repository catalogue from file
+
+    Arguments:
+        catalogue_file (str): filename of the catalogue
+        checksum_file (str): filename of the catalogue's checksum
+    """
+    return Repository(catalogue_file, checksum_file)
+
+
+def search(filename_pattern, repository=None):
+    """Returns a list of available files matching a filename_pattern.
+
+    Arguments:
+        filname_pattern (str): filename pattern, allows for Unix shell-style wildcards
+        repository (Repository): repository object
+    """
+    if repository is None:
+        repository = default_repository
+    assert isinstance(repository, Repository)
+    return repository.search(filename_pattern)
+
+
+def catalogue(repository=None):
+    """Prints a human-friendly list of available files/sizes.
+
+    Arguments:
+        repository (Repository): repository object
+    """
+    if repository is None:
+        repository = default_repository
+    assert isinstance(repository, Repository)
+    print(repository)
 
 
 def fetch(

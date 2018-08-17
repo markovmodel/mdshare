@@ -45,7 +45,7 @@ except RuntimeError as e:
 del dirname, join, warn
 
 
-from .api import fetch
+from .api import load_repository, search, catalogue, fetch
 from .utils import LoadError
 
 

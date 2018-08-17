@@ -19,6 +19,9 @@ import pytest
 import os
 from ..utils import LoadError
 from ..utils import file_hash
+from ..api import load_repository
+from ..api import search
+from ..api import catalogue
 from ..api import fetch
 from .. import default_repository
 
@@ -29,6 +32,37 @@ HASH = '5cbb04531c2e9fa7cc1e5d83195a2f81'
 def file_check(file):
     assert file_hash(file) == HASH
     os.remove(file)
+
+
+def test_load_repository_break():
+    with pytest.raises(TypeError):
+        load_repository(None)
+    with pytest.raises(FileNotFoundError):
+        load_repository('0.0.0.0')
+
+
+def test_search():
+    assert len(search(FILE)) == 1
+    assert search(FILE)[0] == FILE
+    assert len(search(FILE[1:-1])) == 0
+
+
+def test_search_break():
+    with pytest.raises(AssertionError):
+        search(FILE, '0.0.0.0')
+    with pytest.raises(TypeError):
+        search(None)
+
+
+def test_catalogue(capsys):
+    catalogue()
+    captured = capsys.readouterr()
+    assert captured.out == str(default_repository) + '\n'
+
+
+def test_catalogue_break():
+    with pytest.raises(AssertionError):
+        catalogue('0.0.0.0')
 
 
 def test_fetch():
