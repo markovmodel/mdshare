@@ -128,7 +128,7 @@ def fetch(
     else:
         from unittest.mock import MagicMock
         pg = MagicMock()
-        callbacks = [None] * len(files)
+        callbacks = [None] * len(stack)
 
     result = []
     with pg.context():
