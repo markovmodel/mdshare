@@ -63,13 +63,15 @@ def fetch(
                 0, downloaded - pg._prog_rep_progressbars[stage].n)
             pg.update(inc, stage=stage)
             # total progress
-            pg.update(inc, stage=-1)
+            try:
+                pg.update(inc, stage=-1)
+            except RuntimeError:
+                pass
 
         from functools import partial
         tqdm_args = dict(unit='B', file=sys.stdout, unit_scale=True)
-        pg.register(
-            total, description='total', tqdm_args=tqdm_args, stage=-1)
 
+        n_progress_bars = 0
         for stage, item in enumerate(stack):
             if working_directory is not None:
                 path = os.path.join(working_directory, item['file'])
@@ -82,6 +84,10 @@ def fetch(
                         tqdm_args=tqdm_args,
                         stage=stage)
                     callbacks.append(partial(update, stage=stage))
+                    n_progress_bars += 1
+        if n_progress_bars > 1:
+            pg.register(
+                total, description='total', tqdm_args=tqdm_args, stage=-1)
     else:
         from unittest.mock import MagicMock
         pg = MagicMock()
