@@ -80,5 +80,5 @@ def test_fetch_break():
         fetch(None)
     with pytest.raises(LoadError):
         fetch('not-an-existing-file-or-pattern')
-    with pytest.raises(AttributeError):
+    with pytest.raises(AssertionError):
         fetch(FILE, repository='0.0.0.0')

@@ -74,6 +74,7 @@ def fetch(
     """
     if repository is None:
         repository = default_repository
+    assert isinstance(repository, Repository)
     if working_directory is None:
         working_directory = mkdtemp()
     else:
