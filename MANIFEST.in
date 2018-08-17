@@ -1,6 +1,8 @@
 include README.md
 include LICENSE
 include CHANGELOG.md
+include mdshare/mdshare-catalogue.yaml
+include mdshare/mdshare-catalogue.md5
 
 # exclude compiled bytecode
 global-exclude *.pyc

@@ -38,6 +38,7 @@ setup(
     url='https://github.com/markovmodel/mdshare',
     description='Get easy access to our public data files.',
     packages=find_packages(),
+    include_package_data=True,
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
     install_requires=['humanfriendly',
                       'requests',
