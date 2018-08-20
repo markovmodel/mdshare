@@ -45,6 +45,7 @@ setup(
                       ],
     tests_require=['pytest'],
     zip_safe=False,
+    scripts=['bin/mdshare-index-maker.py'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',

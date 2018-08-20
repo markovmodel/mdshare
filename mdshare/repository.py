@@ -40,7 +40,7 @@ class Category(dict):
         return string.rstrip('\n')
 
 
-class Repository:
+class Repository(object):
     def __init__(self, catalogue_file, checksum_file=None):
         if checksum_file is not None:
             with open(checksum_file, 'r') as fh:

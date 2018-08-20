@@ -48,7 +48,7 @@ def make_random_category_dict(n, m):
     return patterns, files, data
 
 
-class RandomCatalogue:
+class RandomCatalogue(object):
     def __init__(self, npattern, nentries, ncontainers, mode=0):
         _, _, index = make_random_category_dict(npattern, nentries)
         _, _, containers = make_random_category_dict(ncontainers, 1)
