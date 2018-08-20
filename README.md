@@ -6,7 +6,8 @@ Get access to our MD data files.
 This is a downloader for molecular dynamics (MD) data from a public FTP server at FU Berlin. See https://markovmodel.github.io/mdshare/ for a full list of available datasets and terms of use.
 
 ## Example
-This code will download a file (if it does not already exist locally) with a featurized set of three alanine dipeptide MD trajectories and store its content of three ``numpy.ndarray`` objects (each of ``shape=[250000, 2], dtype=numpy.float32``) in the list ``trajs``:
+This code will download a file (if it does not already exist locally) with a featurized set of three alanine dipeptide MD trajectories and store its content of three `numpy.ndarray` objects (each of `shape=[250000, 2], dtype=numpy.float32`) in the list `trajs`:
+
 ```python
 import mdshare
 import numpy as np
@@ -16,37 +17,49 @@ with np.load(local_filename) as fh:
     trajs = [fh[key] for key in fh.keys()]
 ```
 
-By default, the ``mdshare.fetch()`` function will look in and download to the current directory (function parameter ``working_directory='.'``). If you instead set this parameter to ``None``,
+By default, the `mdshare.fetch()` function will look in and download to the current directory (function parameter `working_directory='.'`). If you instead set this parameter to `None` ...
+
 ```python
 local_filename = mdshare.fetch(
     'alanine-dipeptide-3x250ns-backbone-dihedrals.npz',
     working_directory=None)
 ```
-the file will be downloaded to a temporary directory with a randomly chosen name. In both cases, the function will return the path to the local file.
 
-Should the requested file already be present in the ``working_directory``, the download is skipped.
+... the file will be downloaded to a temporary directory. In both cases, the function will return the path to the downloaded file.
 
-Use ``mdshare.catalogue()`` to view the files and filesizes of the available trajectories:
+Should the requested file already be present in the `working_directory`, the download is skipped.
+
+Using `mdshare.catalogue()` to view the files and filesizes of the available trajectories ...
 
 ```python
 mdshare.catalogue()
 ```
-Produces the output:
+
+... produces the output:
+
 ```
-alanine-dipeptide-0-250ns-nowater.dcd                        86 MB
-alanine-dipeptide-1-250ns-nowater.dcd                        86 MB
-alanine-dipeptide-2-250ns-nowater.dcd                        86 MB
-alanine-dipeptide-3x250ns-backbone-dihedrals.npz             6 MB
-...
+Repository: http://ftp.imp.fu-berlin.de/pub/cmb-data/
+Files:
+alanine-dipeptide-0-250ns-nowater.xtc                  42.9 MB
+alanine-dipeptide-1-250ns-nowater.xtc                  42.9 MB
+alanine-dipeptide-2-250ns-nowater.xtc                  42.9 MB
+alanine-dipeptide-3x250ns-backbone-dihedrals.npz        6.0 MB
+alanine-dipeptide-3x250ns-heavy-atom-distances.npz    135.0 MB
+[...]
+Containers:
+mdshare-test.tar.gz                                   193.0 bytes
+pyemma-tutorial-livecoms.tar.gz                       123.9 MB
 ```
 
-Use ``mdshare.search(filename_pattern)`` to select for a given group of files:
+Using `mdshare.search(filename_pattern)` to select for a given group of files ...
 
 ```python
 pentapeptide_xtcs = mdshare.search('penta*xtc')
 print(pentapeptide_xtcs)
 ```
-Produces the output:
+
+... produces the output:
+
 ```
 ['pentapeptide-00-500ns-impl-solv.xtc',
  'pentapeptide-01-500ns-impl-solv.xtc',

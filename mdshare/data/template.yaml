@@ -1,0 +1,48 @@
+# MDSHARE TEMPLATE FILE
+#
+# This is the template to compile the current catalogue file.
+# Navigate to the directory where the data files are and run
+#
+#   python path/to/mdshare-index-maker.py path/to/template.yaml
+#
+# This will create a yaml file (NAME.yaml) and a corresponding MD5
+# checksum file (NAME.md5) where NAME corresponds to the 'name' entry
+# in the template.
+#
+# The 'url' entry points to the directory's URL.
+#
+# 'include' denotes all files ion the current directory which should
+# be indexed; you can use unix-style wildcard patterns.
+#
+# 'containers' denotes which files should be grouped in .tar.gz
+# archives; again, you can use unix-style wildcard patterns. The
+# files must be part of 'include'.
+
+name: mdshare-catalogue
+url: 'http://ftp.imp.fu-berlin.de/pub/cmb-data/'
+include:
+  - alanine-dipeptide-*.npz
+  - alanine-dipeptide-*-nowater.xtc
+  - alanine-dipeptide-nowater.pdb
+  - pentapeptide-*-500ns-impl-solv.xtc
+  - pentapeptide-impl-solv.pdb
+  - pyemma-tutorial-mt-data.npz
+  - pyemma-tutorial-tpt-data.npz
+  - pyemma-tutorial-us-data.npz
+  - pyemma-tutorial-us-nacl.npz
+  - methane-dimer-umbrella-sampling.npz
+  - doublewell_disconnected.npy
+  - doublewell_oneway.npy
+  - hmm-doublewell-2d-100k.npz
+  - mdshare-test-00.txt
+containers:
+  pyemma-tutorial-livecoms.tar.gz:
+    - alanine-dipeptide-*-nowater.xtc
+    - alanine-dipeptide-nowater.pdb
+    - pentapeptide-*-500ns-impl-solv.xtc
+    - pentapeptide-impl-solv.pdb
+    - doublewell_disconnected.npy
+    - doublewell_oneway.npy
+    - hmm-doublewell-2d-100k.npz
+  mdshare-test.tar.gz:
+    - mdshare-test-00.txt

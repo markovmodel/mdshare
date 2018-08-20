@@ -1,0 +1,53 @@
+containers:
+  mdshare-test.tar.gz: {hash: dee112e2523653c7cf2ed3eec98e41e8, size: 193}
+  pyemma-tutorial-livecoms.tar.gz: {hash: 4e6a9ba2aa7c5f1a15aa34c7d5ccaa32, size: 123937176}
+index:
+  alanine-dipeptide-0-250ns-nowater.xtc: {hash: e82ba584d8e64491f30bd1d9dd019687,
+    size: 42909936}
+  alanine-dipeptide-1-250ns-nowater.xtc: {hash: 96b7686aa28a459d51a0d77c2dd0316e,
+    size: 42911308}
+  alanine-dipeptide-2-250ns-nowater.xtc: {hash: 6d3a8d9aecb3aa0e0a1ea9b195b7dfe0,
+    size: 42907500}
+  alanine-dipeptide-3x250ns-backbone-dihedrals.npz: {hash: 3fa7c72ba512213a3860f9691602cdc7,
+    size: 6000544}
+  alanine-dipeptide-3x250ns-heavy-atom-distances.npz: {hash: c8d108087fdce3ccb0f8e30e76858925,
+    size: 135000544}
+  alanine-dipeptide-3x250ns-heavy-atom-positions.npz: {hash: 55bd66fe4ee49849dead7faf6bf8b71e,
+    size: 90000544}
+  alanine-dipeptide-nowater.pdb: {hash: 728635667ed4937cf4a0e5b7c801d9ea, size: 1813}
+  doublewell_disconnected.npy: {hash: 26717c09a92cf96cda412a8ab0119360, size: 160096}
+  doublewell_oneway.npy: {hash: 2843dc5108ffc5f2adf9d3d1c8cce804, size: 160096}
+  hmm-doublewell-2d-100k.npz: {hash: aaf37fb708a0f8f82f70d3aa06da205f, size: 2000638}
+  mdshare-test-00.txt: {hash: 5cbb04531c2e9fa7cc1e5d83195a2f81, size: 33}
+  methane-dimer-umbrella-sampling.npz: {hash: e494f8bf0da3283c2d6a6ce9ce10c989, size: 193346}
+  pentapeptide-00-500ns-impl-solv.xtc: {hash: 16967d0bb09d24dc66de4d4885f953a4, size: 2221296}
+  pentapeptide-01-500ns-impl-solv.xtc: {hash: 9db9b87ecafb2d5eb0085adc01b97680, size: 2221268}
+  pentapeptide-02-500ns-impl-solv.xtc: {hash: 5ec89b72fa1e48c3a5e1b1ec707f66fb, size: 2221392}
+  pentapeptide-03-500ns-impl-solv.xtc: {hash: 726208c33f9c9ce0eb2688e5788b8d57, size: 2221596}
+  pentapeptide-04-500ns-impl-solv.xtc: {hash: 934d06ed03744c8cada2123a2cfd6fbf, size: 2221604}
+  pentapeptide-05-500ns-impl-solv.xtc: {hash: 395f614244f3d484db8d4a50f35252fd, size: 2221020}
+  pentapeptide-06-500ns-impl-solv.xtc: {hash: 3a94a06657b5bd7cadf6c3767fc4ca18, size: 2221088}
+  pentapeptide-07-500ns-impl-solv.xtc: {hash: 82c633ed92112bf62bb7070f4393ac2a, size: 2221376}
+  pentapeptide-08-500ns-impl-solv.xtc: {hash: c2f49e03f4c8ef6c8315d844d5d1be0e, size: 2220668}
+  pentapeptide-09-500ns-impl-solv.xtc: {hash: ea74fa65dcb80a086a15c34a907495f3, size: 2221668}
+  pentapeptide-10-500ns-impl-solv.xtc: {hash: 7b374e2402a37f139817be3137e6509e, size: 2221300}
+  pentapeptide-11-500ns-impl-solv.xtc: {hash: 0fe84f969978a492fe26dbb3bd39c6ee, size: 2221672}
+  pentapeptide-12-500ns-impl-solv.xtc: {hash: 8ddaaf213a4b4d34e92cbfbf6f3daad5, size: 2221012}
+  pentapeptide-13-500ns-impl-solv.xtc: {hash: 21ced9d0791a4330c2714a408c6b7b63, size: 2222168}
+  pentapeptide-14-500ns-impl-solv.xtc: {hash: ecd2213ac5de68ef0fc37e9723269d34, size: 2221316}
+  pentapeptide-15-500ns-impl-solv.xtc: {hash: f41d2a6e283d3b43fdf14aa3e95eff03, size: 2221780}
+  pentapeptide-16-500ns-impl-solv.xtc: {hash: 30c8f0805bfa248934714bfb663c4196, size: 2221404}
+  pentapeptide-17-500ns-impl-solv.xtc: {hash: 82c52922cb585962a0b1cab70cc32645, size: 2221296}
+  pentapeptide-18-500ns-impl-solv.xtc: {hash: 6906793b17978370a59025b6c2080ae1, size: 2220924}
+  pentapeptide-19-500ns-impl-solv.xtc: {hash: 4f7948b2f6a5515666b495a1054326c4, size: 2220900}
+  pentapeptide-20-500ns-impl-solv.xtc: {hash: f4f3c376e90826d3dd43bcdf08910863, size: 2221344}
+  pentapeptide-21-500ns-impl-solv.xtc: {hash: e5d2467545d04778d6005c2c904e6df3, size: 2221000}
+  pentapeptide-22-500ns-impl-solv.xtc: {hash: b2cdf3759057ef1a9ccbf9ab41044efa, size: 2220708}
+  pentapeptide-23-500ns-impl-solv.xtc: {hash: 1169c0f9efd028155519fa9bf2a85971, size: 2221592}
+  pentapeptide-24-500ns-impl-solv.xtc: {hash: 8d016a9ea6a5b63843fca58b82b4573c, size: 2220908}
+  pentapeptide-impl-solv.pdb: {hash: c52f482024e0ec7dcd64f2b925b53c2b, size: 7501}
+  pyemma-tutorial-mt-data.npz: {hash: 02f7b91ea2cac71b762f85bdbc4086e9, size: 4763982}
+  pyemma-tutorial-tpt-data.npz: {hash: e3d95283e915cc7992aaefd30cea5462, size: 512952}
+  pyemma-tutorial-us-data.npz: {hash: eb36cfe14a61a5d9a7d5b57ef7f829e8, size: 1622382}
+  pyemma-tutorial-us-nacl.npz: {hash: fca286bd0ffb8f30315e27bff2c1a772, size: 241062}
+url: http://ftp.imp.fu-berlin.de/pub/cmb-data/

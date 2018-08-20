@@ -15,6 +15,12 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+__author__ = 'Christoph Wehmeyer'
+__email__ = 'christoph.wehmeyer@fu-berlin.de'
+__credits__ = ['Guillermo Pérez-Hernández', 'Martin K. Scherer'],
+
+
 from pkg_resources import get_distribution, DistributionNotFound
 try:
     __version__ = get_distribution(__name__).version
@@ -22,11 +28,25 @@ except DistributionNotFound:
     __version__ = 'unknown'
 del get_distribution, DistributionNotFound
 
-__author__ = 'Christoph Wehmeyer'
-__email__ = 'christoph.wehmeyer@fu-berlin.de'
-__credits__ = ['Guillermo Pérez-Hernández', 'Martin K. Scherer'],
 
-from .mdshare import fetch, catalogue, search
+from .repository import Repository
+from os.path import dirname, join
+from warnings import warn
+try:
+    default_repository = Repository(
+        join(dirname(__file__), 'data', 'mdshare-catalogue.yaml'),
+        join(dirname(__file__), 'data', 'mdshare-catalogue.md5'))
+except FileNotFoundError:
+    warn('Cannot build the default repository: missing file(s)!')
+    default_repository = None
+except RuntimeError as e:
+    warn('Cannot build the default repository: {}'.format(e.args[0]))
+    default_repository = None
+del dirname, join, warn
+
+
+from .api import load_repository, search, catalogue, fetch
+from .utils import LoadError
 
 
 def load(*args, **kwargs):

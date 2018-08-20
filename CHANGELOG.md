@@ -21,3 +21,11 @@
 
 #### 0.3.2
 - replaces FTP usage
+
+#### 0.4.0
+- added progressbars
+- major refactoring to have an offline catalogue available
+- allow to download/extract .tar.gz containers
+
+#### upcoming
+- 
