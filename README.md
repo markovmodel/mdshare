@@ -37,7 +37,7 @@ mdshare.catalogue()
 
 ... produces the output:
 
-```
+```text
 Repository: http://ftp.imp.fu-berlin.de/pub/cmb-data/
 Files:
 alanine-dipeptide-0-250ns-nowater.xtc                  42.9 MB
