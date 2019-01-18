@@ -52,7 +52,7 @@ def test_search():
 
 
 def test_search_break():
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         search(FILE, '0.0.0.0')
     with pytest.raises(TypeError):
         search(None)
@@ -66,7 +66,7 @@ def test_catalogue(capsys):
 
 
 def test_catalogue_break():
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         catalogue('0.0.0.0')
 
 
@@ -85,5 +85,5 @@ def test_fetch_break():
         fetch(None)
     with pytest.raises(LoadError):
         fetch('not-an-existing-file-or-pattern')
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         fetch(FILE, repository='0.0.0.0')

@@ -43,7 +43,8 @@ def search(filename_pattern, repository=None):
     """
     if repository is None:
         repository = default_repository
-    assert isinstance(repository, Repository)
+    if not isinstance(repository, Repository):
+        raise TypeError('received {type(repository)} instead of Repository')
     return repository.search(filename_pattern)
 
 
@@ -55,7 +56,8 @@ def catalogue(repository=None):
     """
     if repository is None:
         repository = default_repository
-    assert isinstance(repository, Repository)
+    if not isinstance(repository, Repository):
+        raise TypeError('received {type(repository)} instead of Repository')
     print(repository)
 
 
@@ -74,7 +76,8 @@ def fetch(
     """
     if repository is None:
         repository = default_repository
-    assert isinstance(repository, Repository)
+    if not isinstance(repository, Repository):
+        raise TypeError('received {type(repository)} instead of Repository')
     if working_directory is None:
         working_directory = mkdtemp()
     else:
