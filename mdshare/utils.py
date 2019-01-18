@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,9 @@
 
 import os
 import sys
-import fnmatch
 import logging
-import warnings
-from humanfriendly import format_size
 from requests import HTTPError
-from random import random
 from hashlib import md5
-from time import sleep
-from yaml import load
 
 
 class LoadError(KeyError):
@@ -35,7 +29,7 @@ class LoadError(KeyError):
         self.message = message
 
     def __str__(self):
-        return '{} [{}]'.format(self.file, self.message)
+        return f'{self.file} [{self.message}]'
 
 
 def file_hash(file, chunk_size=65536):
@@ -62,8 +56,8 @@ def url_join(repository_url, file):
         repository_url (str): url of the repository
         file (str): name of the file in the repository
     """
-    return repository_url.rstrip('/') + '/' + file.lstrip('/')
-    
+    return f'{repository_url.rstrip("/")}/{file.lstrip("/")}'
+
 
 def download_file(repository, file, local_path, callback=None):
     """Download a file.
@@ -76,11 +70,10 @@ def download_file(repository, file, local_path, callback=None):
     """
     location, metadata = repository.lookup(file)
     logging.debug(
-        'Repository::{}::{} has checksum {} and size {}'.format(
-            location, file, metadata['hash'], metadata['size']))
+        f'Repository::{location}::{file} has checksum {metadata["hash"]}'
+        f' and size {metadata["size"]}')
     logging.debug(
-        'From <{}> download <{}> to <{}>'.format(
-            repository.url, file, local_path))
+        f'From <{repository.url}> download <{file}> to <{local_path}>')
     response = repository._get_connection().get(
         url_join(repository.url, file),
         stream=True)
@@ -91,9 +84,7 @@ def download_file(repository, file, local_path, callback=None):
             if callback is not None:
                 callback(i, blocksize)
     checksum = file_hash(local_path)
-    logging.debug(
-        'Loaded file {} has {}'.format(
-            local_path, checksum))
+    logging.debug(f'Loaded file {local_path} has {checksum}')
     if checksum != metadata['hash']:
         raise LoadError(file, 'checksum test failed')
     return local_path
@@ -118,18 +109,17 @@ def attempt_to_download_file(
     filename = None
 
     def fault_handler(filename, exception):
-        print('error:', exception, file=sys.stderr)
+        print(f'error: {exception}', file=sys.stderr)
         try:
             # remove faulty files
             os.unlink(filename)
         except:
-            pass
+            print(f'warning: could not remove file {filename}', file=sys.stderr)
         raise exception
 
     while attempt < max_attempts:
         attempt += 1
-        logging.debug(
-            'download attempt {}/{} ...'.format(attempt, max_attempts))
+        logging.debug(f'download attempt {attempt}/{max_attempts} ...')
         try:
             filename = download_file(
                 repository,
@@ -158,22 +148,19 @@ def download_wrapper(
         callback (callable): callback function
     """
     logging.debug(
-        'download_wrapper({}, {}, working_directory="{}",'
-        ' max_attempts={}, force={})'.format(
-            repository.url, file, working_directory,
-            max_attempts, force))
+        f'download_wrapper({repository.url}, {file},'
+        f' working_directory="{working_directory}",'
+        f' max_attempts={max_attempts}, force={force})')
     if working_directory is None:
         raise RuntimeError(
             'working_directory=None is illegal at this point')
     local_path = os.path.join(working_directory, file)
-    logging.debug('local_path={}'.format(local_path))
+    logging.debug(f'local_path={local_path}')
     if os.path.exists(local_path) and not force:
-        logging.debug(
-            'local_path={} exists ... return'.format(local_path))
+        logging.debug(f'local_path={local_path} exists ... return')
         return local_path
     logging.debug(
-        'local_path={} does not exist ...'
-        ' attempting download'.format(local_path))
+        f'local_path={local_path} does not exist ... attempting download')
     return attempt_to_download_file(
         repository,
         file,

@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,8 @@ HASH = '5cbb04531c2e9fa7cc1e5d83195a2f81'
 
 
 def file_check(file):
-    assert file_hash(file) == HASH
+    if file_hash(file) != HASH:
+        raise AssertionError()
     os.remove(file)
 
 
@@ -38,18 +39,21 @@ def test_load_repository_break():
     with pytest.raises(TypeError):
         load_repository(None)
     with pytest.raises(FileNotFoundError):
-        load_repository('0.0.0.0')
+        load_repository('not-a-repository')
 
 
 def test_search():
-    assert len(search(FILE)) == 1
-    assert search(FILE)[0] == FILE
-    assert len(search(FILE[1:-1])) == 0
+    if len(search(FILE)) != 1:
+        raise AssertionError()
+    if search(FILE)[0] != FILE:
+        raise AssertionError()
+    if len(search(FILE[1:-1])) != 0:
+        raise AssertionError()
 
 
 def test_search_break():
-    with pytest.raises(AssertionError):
-        search(FILE, '0.0.0.0')
+    with pytest.raises(TypeError):
+        search(FILE, 'not-a-repository')
     with pytest.raises(TypeError):
         search(None)
 
@@ -57,17 +61,18 @@ def test_search_break():
 def test_catalogue(capsys):
     catalogue()
     captured = capsys.readouterr()
-    assert captured.out == str(default_repository) + '\n'
+    if captured.out != f'{str(default_repository)}\n':
+        raise AssertionError()
 
 
 def test_catalogue_break():
-    with pytest.raises(AssertionError):
-        catalogue('0.0.0.0')
+    with pytest.raises(TypeError):
+        catalogue('not-a-repository')
 
 
 def test_fetch():
     file_check(fetch(FILE))
-    file_check(fetch('*{}*'.format(FILE[1:-1])))
+    file_check(fetch(f'*{FILE[1:-1]}*'))
     file_check(fetch(FILE, repository=default_repository))
 
 
@@ -80,5 +85,5 @@ def test_fetch_break():
         fetch(None)
     with pytest.raises(LoadError):
         fetch('not-an-existing-file-or-pattern')
-    with pytest.raises(AssertionError):
-        fetch(FILE, repository='0.0.0.0')
+    with pytest.raises(TypeError):
+        fetch(FILE, repository='not-a-repository')

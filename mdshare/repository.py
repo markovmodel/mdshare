@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,9 @@
 
 from humanfriendly import format_size
 from yaml import load
-import warnings
 import requests
 import fnmatch
-import logging
-from .utils import LoadError, file_hash, url_join
+from .utils import LoadError, file_hash
 
 
 class Category(dict):
@@ -35,8 +33,7 @@ class Category(dict):
         string = ''
         for key in sorted(self.keys()):
             size, unit = format_size(self[key]['size']).split(' ')
-            string += '{:50s}   {:6.1f} {}\n'.format(
-                key, float(size), unit)
+            string += f'{key:50s}   {float(size):6.1f} {unit}\n'
         return string.rstrip('\n')
 
 
@@ -46,16 +43,14 @@ class Repository(object):
             with open(checksum_file, 'r') as fh:
                 if file_hash(catalogue_file) != fh.read():
                     raise RuntimeError(
-                        'Checksums do not match, check'
-                        ' your catalogue files!')
+                        'Checksums do not match, check your catalogue files!')
         self.catalogue_file = catalogue_file
         with open(self.catalogue_file, 'r') as fh:
             data = load(fh)
         for key in ('url', 'index', 'containers'):
             if key not in data:
                 raise RuntimeError(
-                    'Cannot build repository catalogue without'
-                    ' the {} key'.format(key))
+                    f'Cannot build repository catalogue without the {key} key')
         self.url = data['url']
         self.index = Category(data['index'])
         self.containers = Category(data['containers'])
@@ -69,11 +64,11 @@ class Repository(object):
         raise LoadError(key, 'file not in repository catalogue')
 
     def size(self, key):
-        location, data = self.lookup(key)
+        _, data = self.lookup(key)
         return data['size']
 
     def hash(self, key):
-        location, data = self.lookup(key)
+        _, data = self.lookup(key)
         return data['hash']
 
     def search(self, pattern):
@@ -96,7 +91,7 @@ class Repository(object):
         return self._connection
 
     def __str__(self):
-        string = 'Repository: {}\n'.format(self.url)
-        string += 'Files:\n' + str(self.index) + '\n'
-        string += 'Containers:\n' + str(self.containers)
+        string = f'Repository: {self.url}\n'
+        string += f'Files:\n{self.index}\n'
+        string += f'Containers:\n{self.containers}'
         return string

@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,8 @@ def search(filename_pattern, repository=None):
     """
     if repository is None:
         repository = default_repository
-    assert isinstance(repository, Repository)
+    if not isinstance(repository, Repository):
+        raise TypeError('received {type(repository)} instead of Repository')
     return repository.search(filename_pattern)
 
 
@@ -55,7 +56,8 @@ def catalogue(repository=None):
     """
     if repository is None:
         repository = default_repository
-    assert isinstance(repository, Repository)
+    if not isinstance(repository, Repository):
+        raise TypeError('received {type(repository)} instead of Repository')
     print(repository)
 
 
@@ -74,7 +76,8 @@ def fetch(
     """
     if repository is None:
         repository = default_repository
-    assert isinstance(repository, Repository)
+    if not isinstance(repository, Repository):
+        raise TypeError('received {type(repository)} instead of Repository')
     if working_directory is None:
         working_directory = mkdtemp()
     else:
@@ -117,7 +120,7 @@ def fetch(
                 else:
                     pg.register(
                         item['size'],
-                        description='downloading {}'.format(item['file']),
+                        description=f'downloading {item["file"]}',
                         tqdm_args=tqdm_args,
                         stage=stage)
                     callbacks.append(partial(update, stage=stage))

@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ def randomizer(length, pattern=None):
                       for x in range(length)])
     if pattern is None:
         return sample
-    return '{s}-{p}-{s}'.format(s=sample, p=pattern)
+    return f'{sample}-{pattern}-{sample}'
 
 
 def make_random_category_dict(n, m):
@@ -53,8 +53,7 @@ class RandomCatalogue(object):
         _, _, index = make_random_category_dict(npattern, nentries)
         _, _, containers = make_random_category_dict(ncontainers, 1)
         self.data = dict(
-            url='http://{}.{}/{}'.format(
-                randomizer(10), randomizer(3), randomizer(7)),
+            url=f'http://{randomizer(10)}.{randomizer(3)}/{randomizer(7)}',
             index=index,
             containers=containers)
         self.offset = ''
@@ -69,69 +68,89 @@ class RandomCatalogue(object):
         self.file = randomizer(25)
 
     def __enter__(self):
-        with open(self.file + '.yaml', 'w') as fh:
+        with open(f'{self.file}.yaml', 'w') as fh:
             fh.write(dump(self.data))
-        with open(self.file + '.md5', 'w') as fh:
-            fh.write(file_hash(self.file + '.yaml') + self.offset)
+        with open(f'{self.file}.md5', 'w') as fh:
+            fh.write(file_hash(f'{self.file}.yaml') + self.offset)
         return (self.data, self.file)
 
     def __exit__(self, exception_type, exception_value, traceback):
-        os.remove(self.file + '.yaml')
-        os.remove(self.file + '.md5')
+        os.remove(f'{self.file}.yaml')
+        os.remove(f'{self.file}.md5')
 
 
 def test_category():
     n, m = random.randint(2, 6), random.randint(2, 6)
     patterns, files, data = make_random_category_dict(n, m)
     category = Category(data)
-    assert len(category.keys()) == n * m
+    if len(category.keys()) != n * m:
+        raise AssertionError()
     for pattern in patterns:
-        assert len(category.search('*-{}-*'.format(pattern))) == m
-        assert len(category.search('*-{}-*'.format(pattern[1:-1]))) == 0
+        if len(category.search(f'*-{pattern}-*')) != m:
+            raise AssertionError()
+        if len(category.search(f'*-{pattern[1:-1]}-*')) != 0:
+            raise AssertionError()
     string = str(category)
     for file in files:
         for key in ('hash', 'size'):
-            assert category[file][key] == data[file][key]
-        assert file in string
+            if category[file][key] != data[file][key]:
+                raise AssertionError()
+        if file not in string:
+            raise AssertionError()
 
 
 def test_repository():
     args = [random.randint(2, 7) for _ in range(3)]
     with RandomCatalogue(*args, mode=0) as (data, file):
-        repository = Repository(file + '.yaml', file + '.md5')
+        repository = Repository(f'{file}.yaml', f'{file}.md5')
     string = str(repository)
-    assert repository.url == data['url']
-    assert data['url'] in string
+    if repository.url != data['url']:
+        raise AssertionError()
+    if data['url'] not in string:
+        raise AssertionError()
     for file in data['index']:
-        assert file in string
-        assert file in repository.index
+        if file not in string:
+            raise AssertionError()
+        if file not in repository.index:
+            raise AssertionError()
         location, metadata = repository.lookup(file)
-        assert location == 'index'
-        assert metadata['size'] == data['index'][file]['size']
-        assert metadata['hash'] == data['index'][file]['hash']
-        assert repository.size(file) == data['index'][file]['size']
-        assert repository.hash(file) == data['index'][file]['hash']
+        if location != 'index':
+            raise AssertionError()
+        if metadata['size'] != data['index'][file]['size']:
+            raise AssertionError()
+        if metadata['hash'] != data['index'][file]['hash']:
+            raise AssertionError()
+        if repository.size(file) != data['index'][file]['size']:
+            raise AssertionError()
+        if repository.hash(file) != data['index'][file]['hash']:
+            raise AssertionError()
     for file in data['containers']:
-        assert file in string
-        assert file in repository.containers
+        if file not in string:
+            raise AssertionError()
+        if file not in repository.containers:
+            raise AssertionError()
         location, metadata = repository.lookup(file)
-        assert location == 'containers'
-        assert metadata['size'] == data['containers'][file]['size']
-        assert metadata['hash'] == data['containers'][file]['hash']
-        assert repository.size(file) == data['containers'][file]['size']
-        assert repository.hash(file) == data['containers'][file]['hash']
+        if location != 'containers':
+            raise AssertionError()
+        if metadata['size'] != data['containers'][file]['size']:
+            raise AssertionError()
+        if metadata['hash'] != data['containers'][file]['hash']:
+            raise AssertionError()
+        if repository.size(file) != data['containers'][file]['size']:
+            raise AssertionError()
+        if repository.hash(file) != data['containers'][file]['hash']:
+            raise AssertionError()
 
 
 def test_repository_break():
     for mode in range(4):
         with RandomCatalogue(4, 3, 2, mode=mode + 1) as (data, file):
             with pytest.raises(RuntimeError):
-                Repository(file + '.yaml', file + '.md5')
+                Repository(f'{file}.yaml', f'{file}.md5')
     args = [random.randint(2, 7) for _ in range(3)]
     with RandomCatalogue(*args, mode=0) as (data, file):
-        repository = Repository(file + '.yaml', file + '.md5')
+        repository = Repository(f'{file}.yaml', f'{file}.md5')
     for location in ('index', 'containers'):
         for file in data[location]:
             with pytest.raises(LoadError):
                 repository.lookup(file[1:-1])
-    

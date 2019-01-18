@@ -1,5 +1,5 @@
 #   This file is part of the markovmodel/mdshare project.
-#   Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+#   Copyright (C) 2017-2019 Computational Molecular Biology Group,
 #   Freie Universitaet Berlin (GER)
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ except FileNotFoundError:
     warn('Cannot build the default repository: missing file(s)!')
     default_repository = None
 except RuntimeError as e:
-    warn('Cannot build the default repository: {}'.format(e.args[0]))
+    warn(f'Cannot build the default repository: {e.args[0]}')
     default_repository = None
 del dirname, join, warn
 

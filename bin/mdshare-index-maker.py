@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,6 @@ from yaml import load, dump
 import fnmatch
 import tarfile
 import os
-
-"""Build or test a catalogue; see mdshare/data/template for a build example"""
 
 
 def filter_files(files, patterns):
@@ -57,8 +55,8 @@ def build(template_file):
         template = load(fh)
 
     for key in ('url', 'include', 'containers'):
-        assert key in template, \
-        'Cannot build without {} key'.format(key)
+        if key not in template:
+            raise RuntimeError(f'Cannot build without {key} key')
 
     db = dict(
         url=template['url'],
@@ -73,16 +71,16 @@ def build(template_file):
         make_container(container, filter_files(files, patterns))
         db['containers'].update({container: get_metadata(container)})
 
-    catalogue = '{}.yaml'.format(template['name'])
+    catalogue = f'{template["name"]}.yaml'
     with open(catalogue, 'w') as fh:
         fh.write(dump(db))
 
-    checksum = '{}.md5'.format(template['name'])
+    checksum = f'{template["name"]}.md5'
     with open(checksum, 'w') as fh:
         fh.write(file_hash(catalogue))
 
-    print('catalogue written to: {}'.format(catalogue))
-    print('checksum written to:  {}'.format(checksum))
+    print(f'catalogue written to: {catalogue}')
+    print(f'checksum written to:  {checksum}')
 
 
 def test(catalogue_file, checksum_file):
@@ -130,4 +128,4 @@ if __name__ == '__main__':
     elif args.mode.lower() == 'test':
         test(args.yaml, args.md5)
     else:
-        raise ValueError('Unsupported mode: {}'.format(args.mode))
+        raise ValueError(f'Unsupported mode: {args.mode}')

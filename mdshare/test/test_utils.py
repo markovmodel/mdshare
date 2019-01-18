@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from requests import HTTPError
-from tempfile import mkdtemp
 import string
 import random
 import pytest
@@ -44,11 +42,13 @@ def local_file():
 def file_check(file):
     checksum = file_hash(file)
     os.remove(file)
-    assert checksum == HASH
+    if checksum != HASH:
+        raise AssertionError()
 
 
 def test_file_hash():
-    assert file_hash('LICENSE') == 'bb3ca60759f3202f1ae42e3519cd06bc'
+    if file_hash('LICENSE') != 'bb3ca60759f3202f1ae42e3519cd06bc':
+        raise AssertionError()
 
 
 def test_file_hash_break():
@@ -59,13 +59,19 @@ def test_file_hash_break():
 
 
 def test_url_join():
-    url = REPO_URL + '/' + FILE
-    assert url_join(REPO_URL, FILE) == url
-    assert url_join(REPO_URL, FILE) == url
-    assert url_join(REPO_URL,  '/' + FILE) == url
-    assert url_join(REPO_URL + '/',  '/' + FILE) == url
-    assert url_join(REPO_URL + '//', FILE) == url
-    assert url_join(REPO_URL,  '//' + FILE) == url
+    url = f'{REPO_URL}/{FILE}'
+    if url_join(REPO_URL, FILE) != url:
+        raise AssertionError()
+    if url_join(REPO_URL, FILE) != url:
+        raise AssertionError()
+    if url_join(REPO_URL,  f'/{FILE}') != url:
+        raise AssertionError()
+    if url_join(f'{REPO_URL}/',  f'/{FILE}') != url:
+        raise AssertionError()
+    if url_join(f'{REPO_URL}//', FILE) != url:
+        raise AssertionError()
+    if url_join(REPO_URL,  f'//{FILE}') != url:
+        raise AssertionError()
 
 
 def test_url_join_break():
@@ -81,7 +87,7 @@ def test_url_join_break():
 
 def test_download_file():
     file_check(download_file(REPO, FILE, local_file()))
-    
+
 
 def test_download_file_break():
     with pytest.raises(LoadError):
@@ -91,7 +97,7 @@ def test_download_file_break():
     with pytest.raises(AttributeError):
         download_file(None, FILE, local_file())
     with pytest.raises(AttributeError):
-        download_file('0.0.0.0', FILE, local_file())
+        download_file('not-a-repository', FILE, local_file())
 
 
 def test_attempt_to_download_file():
@@ -121,7 +127,8 @@ def test_download_wrapper():
     file_check(download_wrapper(REPO, FILE, max_attempts=10))
     with open(FILE, 'w') as fh:
         fh.write('nonsense content')
-    assert file_hash(download_wrapper(REPO, FILE)) != HASH
+    if file_hash(download_wrapper(REPO, FILE)) == HASH:
+        raise AssertionError()
     file_check(download_wrapper(REPO, FILE, force=True))
 
 
@@ -135,6 +142,6 @@ def test_download_wrapper_break():
     with pytest.raises(AttributeError):
         download_wrapper(None, FILE)
     with pytest.raises(AttributeError):
-        download_wrapper('0.0.0.0', FILE)
+        download_wrapper('not-a-repository', FILE)
     with pytest.raises(LoadError):
         download_wrapper(REPO, FILE, max_attempts=0)
