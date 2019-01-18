@@ -44,11 +44,13 @@ def local_file():
 def file_check(file):
     checksum = file_hash(file)
     os.remove(file)
-    assert checksum == HASH
+    if checksum != HASH:
+        raise AssertionError()
 
 
 def test_file_hash():
-    assert file_hash('LICENSE') == 'bb3ca60759f3202f1ae42e3519cd06bc'
+    if file_hash('LICENSE') != 'bb3ca60759f3202f1ae42e3519cd06bc':
+        raise AssertionError()
 
 
 def test_file_hash_break():
@@ -60,12 +62,18 @@ def test_file_hash_break():
 
 def test_url_join():
     url = f'{REPO_URL}/{FILE}'
-    assert url_join(REPO_URL, FILE) == url
-    assert url_join(REPO_URL, FILE) == url
-    assert url_join(REPO_URL,  f'/{FILE}') == url
-    assert url_join(f'{REPO_URL}/',  f'/{FILE}') == url
-    assert url_join(f'{REPO_URL}//', FILE) == url
-    assert url_join(REPO_URL,  f'//{FILE}') == url
+    if url_join(REPO_URL, FILE) != url:
+        raise AssertionError()
+    if url_join(REPO_URL, FILE) != url:
+        raise AssertionError()
+    if url_join(REPO_URL,  f'/{FILE}') != url:
+        raise AssertionError()
+    if url_join(f'{REPO_URL}/',  f'/{FILE}') != url:
+        raise AssertionError()
+    if url_join(f'{REPO_URL}//', FILE) != url:
+        raise AssertionError()
+    if url_join(REPO_URL,  f'//{FILE}') != url:
+        raise AssertionError()
 
 
 def test_url_join_break():
@@ -121,7 +129,8 @@ def test_download_wrapper():
     file_check(download_wrapper(REPO, FILE, max_attempts=10))
     with open(FILE, 'w') as fh:
         fh.write('nonsense content')
-    assert file_hash(download_wrapper(REPO, FILE)) != HASH
+    if file_hash(download_wrapper(REPO, FILE)) == HASH:
+        raise AssertionError()
     file_check(download_wrapper(REPO, FILE, force=True))
 
 

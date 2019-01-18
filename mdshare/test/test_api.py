@@ -30,7 +30,8 @@ HASH = '5cbb04531c2e9fa7cc1e5d83195a2f81'
 
 
 def file_check(file):
-    assert file_hash(file) == HASH
+    if file_hash(file) != HASH:
+        raise AssertionError()
     os.remove(file)
 
 
@@ -42,9 +43,12 @@ def test_load_repository_break():
 
 
 def test_search():
-    assert len(search(FILE)) == 1
-    assert search(FILE)[0] == FILE
-    assert len(search(FILE[1:-1])) == 0
+    if len(search(FILE)) != 1:
+        raise AssertionError()
+    if search(FILE)[0] != FILE:
+        raise AssertionError()
+    if len(search(FILE[1:-1])) != 0:
+        raise AssertionError()
 
 
 def test_search_break():
@@ -57,7 +61,8 @@ def test_search_break():
 def test_catalogue(capsys):
     catalogue()
     captured = capsys.readouterr()
-    assert captured.out == f'{str(default_repository)}\n'
+    if captured.out != f'{str(default_repository)}\n':
+        raise AssertionError()
 
 
 def test_catalogue_break():
