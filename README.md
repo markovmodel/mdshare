@@ -2,6 +2,7 @@
 Get access to our MD data files.
 
 [![CircleCI](https://circleci.com/gh/markovmodel/mdshare/tree/master.svg?style=svg)](https://circleci.com/gh/markovmodel/mdshare/tree/master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9a86155b4e84bf3b397bad0c04e42a9)](https://www.codacy.com/app/cwehmeyer/mdshare?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=markovmodel/mdshare&amp;utm_campaign=Badge_Grade)
 
 This is a downloader for molecular dynamics (MD) data from a public FTP server at FU Berlin. See [here](https://markovmodel.github.io/mdshare/) for a full list of available datasets and terms of use.
 

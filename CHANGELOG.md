@@ -23,8 +23,8 @@
 -   replaces FTP usage
 
 ## 0.4.0
-- added progressbars
-- major refactoring to have an offline catalogue available
-- allow to download/extract .tar.gz containers
+-   added progressbars
+-   major refactoring to have an offline catalogue available
+-   allow to download/extract .tar.gz containers
 
 ### upcoming
