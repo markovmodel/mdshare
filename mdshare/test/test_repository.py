@@ -31,7 +31,7 @@ def randomizer(length, pattern=None):
                       for x in range(length)])
     if pattern is None:
         return sample
-    return '{s}-{p}-{s}'.format(s=sample, p=pattern)
+    return f'{sample}-{pattern}-{sample}'
 
 
 def make_random_category_dict(n, m):
@@ -53,8 +53,7 @@ class RandomCatalogue(object):
         _, _, index = make_random_category_dict(npattern, nentries)
         _, _, containers = make_random_category_dict(ncontainers, 1)
         self.data = dict(
-            url='http://{}.{}/{}'.format(
-                randomizer(10), randomizer(3), randomizer(7)),
+            url=f'http://{randomizer(10)}.{randomizer(3)}/{randomizer(7)}',
             index=index,
             containers=containers)
         self.offset = ''
@@ -69,15 +68,15 @@ class RandomCatalogue(object):
         self.file = randomizer(25)
 
     def __enter__(self):
-        with open(self.file + '.yaml', 'w') as fh:
+        with open(f'{self.file}.yaml', 'w') as fh:
             fh.write(dump(self.data))
-        with open(self.file + '.md5', 'w') as fh:
-            fh.write(file_hash(self.file + '.yaml') + self.offset)
+        with open(f'{self.file}.md5', 'w') as fh:
+            fh.write(file_hash(f'{self.file}.yaml') + self.offset)
         return (self.data, self.file)
 
     def __exit__(self, exception_type, exception_value, traceback):
-        os.remove(self.file + '.yaml')
-        os.remove(self.file + '.md5')
+        os.remove(f'{self.file}.yaml')
+        os.remove(f'{self.file}.md5')
 
 
 def test_category():
@@ -87,9 +86,9 @@ def test_category():
     if len(category.keys()) != n * m:
         raise AssertionError()
     for pattern in patterns:
-        if len(category.search('*-{}-*'.format(pattern))) != m:
+        if len(category.search(f'*-{pattern}-*')) != m:
             raise AssertionError()
-        if len(category.search('*-{}-*'.format(pattern[1:-1]))) != 0:
+        if len(category.search(f'*-{pattern[1:-1]}-*')) != 0:
             raise AssertionError()
     string = str(category)
     for file in files:
@@ -103,7 +102,7 @@ def test_category():
 def test_repository():
     args = [random.randint(2, 7) for _ in range(3)]
     with RandomCatalogue(*args, mode=0) as (data, file):
-        repository = Repository(file + '.yaml', file + '.md5')
+        repository = Repository(f'{file}.yaml', f'{file}.md5')
     string = str(repository)
     if repository.url != data['url']:
         raise AssertionError()
@@ -147,10 +146,10 @@ def test_repository_break():
     for mode in range(4):
         with RandomCatalogue(4, 3, 2, mode=mode + 1) as (data, file):
             with pytest.raises(RuntimeError):
-                Repository(file + '.yaml', file + '.md5')
+                Repository(f'{file}.yaml', f'{file}.md5')
     args = [random.randint(2, 7) for _ in range(3)]
     with RandomCatalogue(*args, mode=0) as (data, file):
-        repository = Repository(file + '.yaml', file + '.md5')
+        repository = Repository(f'{file}.yaml', f'{file}.md5')
     for location in ('index', 'containers'):
         for file in data[location]:
             with pytest.raises(LoadError):

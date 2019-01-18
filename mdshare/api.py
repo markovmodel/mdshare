@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -117,7 +117,7 @@ def fetch(
                 else:
                     pg.register(
                         item['size'],
-                        description='downloading {}'.format(item['file']),
+                        description=f'downloading {item["file"]}',
                         tqdm_args=tqdm_args,
                         stage=stage)
                     callbacks.append(partial(update, stage=stage))

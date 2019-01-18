@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -59,13 +59,13 @@ def test_file_hash_break():
 
 
 def test_url_join():
-    url = REPO_URL + '/' + FILE
+    url = f'{REPO_URL}/{FILE}'
     assert url_join(REPO_URL, FILE) == url
     assert url_join(REPO_URL, FILE) == url
-    assert url_join(REPO_URL,  '/' + FILE) == url
-    assert url_join(REPO_URL + '/',  '/' + FILE) == url
-    assert url_join(REPO_URL + '//', FILE) == url
-    assert url_join(REPO_URL,  '//' + FILE) == url
+    assert url_join(REPO_URL,  f'/{FILE}') == url
+    assert url_join(f'{REPO_URL}/',  f'/{FILE}') == url
+    assert url_join(f'{REPO_URL}//', FILE) == url
+    assert url_join(REPO_URL,  f'//{FILE}') == url
 
 
 def test_url_join_break():

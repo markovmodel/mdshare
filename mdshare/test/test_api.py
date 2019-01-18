@@ -1,5 +1,5 @@
 # This file is part of the markovmodel/mdshare project.
-# Copyright (C) 2017, 2018 Computational Molecular Biology Group,
+# Copyright (C) 2017-2019 Computational Molecular Biology Group,
 # Freie Universitaet Berlin (GER)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ def test_search_break():
 def test_catalogue(capsys):
     catalogue()
     captured = capsys.readouterr()
-    assert captured.out == str(default_repository) + '\n'
+    assert captured.out == f'{str(default_repository)}\n'
 
 
 def test_catalogue_break():
@@ -67,7 +67,7 @@ def test_catalogue_break():
 
 def test_fetch():
     file_check(fetch(FILE))
-    file_check(fetch('*{}*'.format(FILE[1:-1])))
+    file_check(fetch(f'*{FILE[1:-1]}*'))
     file_check(fetch(FILE, repository=default_repository))
 
 
