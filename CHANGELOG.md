@@ -28,3 +28,5 @@
 -   allow to download/extract .tar.gz containers
 
 ### upcoming
+-   removed obsolete/unsused imports/variables/...
+-   replaced assert statements
