@@ -17,11 +17,9 @@
 
 from humanfriendly import format_size
 from yaml import load
-import warnings
 import requests
 import fnmatch
-import logging
-from .utils import LoadError, file_hash, url_join
+from .utils import LoadError, file_hash
 
 
 class Category(dict):
@@ -66,11 +64,11 @@ class Repository(object):
         raise LoadError(key, 'file not in repository catalogue')
 
     def size(self, key):
-        location, data = self.lookup(key)
+        _, data = self.lookup(key)
         return data['size']
 
     def hash(self, key):
-        location, data = self.lookup(key)
+        _, data = self.lookup(key)
         return data['hash']
 
     def search(self, pattern):

@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from requests import HTTPError
-from tempfile import mkdtemp
 import string
 import random
 import pytest
@@ -89,7 +87,7 @@ def test_url_join_break():
 
 def test_download_file():
     file_check(download_file(REPO, FILE, local_file()))
-    
+
 
 def test_download_file_break():
     with pytest.raises(LoadError):
@@ -99,7 +97,7 @@ def test_download_file_break():
     with pytest.raises(AttributeError):
         download_file(None, FILE, local_file())
     with pytest.raises(AttributeError):
-        download_file('0.0.0.0', FILE, local_file())
+        download_file('not-a-repository', FILE, local_file())
 
 
 def test_attempt_to_download_file():
@@ -144,6 +142,6 @@ def test_download_wrapper_break():
     with pytest.raises(AttributeError):
         download_wrapper(None, FILE)
     with pytest.raises(AttributeError):
-        download_wrapper('0.0.0.0', FILE)
+        download_wrapper('not-a-repository', FILE)
     with pytest.raises(LoadError):
         download_wrapper(REPO, FILE, max_attempts=0)

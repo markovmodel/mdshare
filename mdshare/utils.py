@@ -17,15 +17,9 @@
 
 import os
 import sys
-import fnmatch
 import logging
-import warnings
-from humanfriendly import format_size
 from requests import HTTPError
-from random import random
 from hashlib import md5
-from time import sleep
-from yaml import load
 
 
 class LoadError(KeyError):
@@ -63,7 +57,7 @@ def url_join(repository_url, file):
         file (str): name of the file in the repository
     """
     return f'{repository_url.rstrip("/")}/{file.lstrip("/")}'
-    
+
 
 def download_file(repository, file, local_path, callback=None):
     """Download a file.

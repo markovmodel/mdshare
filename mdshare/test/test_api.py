@@ -39,7 +39,7 @@ def test_load_repository_break():
     with pytest.raises(TypeError):
         load_repository(None)
     with pytest.raises(FileNotFoundError):
-        load_repository('0.0.0.0')
+        load_repository('not-a-repository')
 
 
 def test_search():
@@ -53,7 +53,7 @@ def test_search():
 
 def test_search_break():
     with pytest.raises(TypeError):
-        search(FILE, '0.0.0.0')
+        search(FILE, 'not-a-repository')
     with pytest.raises(TypeError):
         search(None)
 
@@ -67,7 +67,7 @@ def test_catalogue(capsys):
 
 def test_catalogue_break():
     with pytest.raises(TypeError):
-        catalogue('0.0.0.0')
+        catalogue('not-a-repository')
 
 
 def test_fetch():
@@ -86,4 +86,4 @@ def test_fetch_break():
     with pytest.raises(LoadError):
         fetch('not-an-existing-file-or-pattern')
     with pytest.raises(TypeError):
-        fetch(FILE, repository='0.0.0.0')
+        fetch(FILE, repository='not-a-repository')
