@@ -38,7 +38,7 @@ def search(filename_pattern, repository=None):
     """Returns a list of available files matching a filename_pattern.
 
     Arguments:
-        filname_pattern (str): filename pattern, allows for Unix shell-style wildcards
+        filename_pattern (str): filename pattern, allows for Unix shell-style wildcards
         repository (Repository): repository object
     """
     if repository is None:
