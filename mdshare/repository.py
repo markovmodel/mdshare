@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from humanfriendly import format_size
-from yaml import load
+from yaml import safe_load
 import requests
 import fnmatch
 from .utils import LoadError, file_hash
@@ -46,7 +46,7 @@ class Repository(object):
                         'Checksums do not match, check your catalogue files!')
         self.catalogue_file = catalogue_file
         with open(self.catalogue_file, 'r') as fh:
-            data = load(fh)
+            data = safe_load(fh)
         for key in ('url', 'index', 'containers'):
             if key not in data:
                 raise RuntimeError(

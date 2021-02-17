@@ -65,7 +65,7 @@ def download_file(repository, file, local_path, callback=None):
     Arguments:
         repository (Repository): repository object
         file (str): name of the file in the repository
-        local_filename (str): local path where the file should be saved
+        local_path (str): local path where the file should be saved
         callback (callable): callback function
     """
     location, metadata = repository.lookup(file)
@@ -101,7 +101,7 @@ def attempt_to_download_file(
     Arguments:
         repository (Repository): repository object
         file (str): name of the file in the repository
-        local_filename (str): local path where the file should be saved
+        local_path (str): local path where the file should be saved
         max_attempts (int): number of download attempts
         callback (callable): callback function
     """
