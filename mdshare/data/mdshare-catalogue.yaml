@@ -1,9 +1,9 @@
 containers:
   mdshare-test.tar.gz:
-    hash: 49e00e1b4b40f60964253d63959a8f95
+    hash: 8eda06f1af3760ee788101ecb59dba69
     size: 232
   pyemma-tutorial-livecoms.tar.gz:
-    hash: 30c055059d18709180c15cc43c365258
+    hash: 71eebc44c37825fbedb87b35d3b76587
     size: 123939712
 index:
   alanine-dipeptide-0-250ns-nowater.xtc:
@@ -49,8 +49,8 @@ index:
     hash: fdbbd2376541e4be13c503cfa13e789c
     size: 8320
   imd_full_system_trajectory.npy:
-    hash: e4dfb0068b88c47ecf76c853b44dc750
-    size: 80000128
+    hash: 1d77481bc2d6527016e4791a01349347
+    size: 8000128
   mdshare-test-00.txt:
     hash: 5cbb04531c2e9fa7cc1e5d83195a2f81
     size: 33
