@@ -3,7 +3,7 @@
 # This is the template to compile the current catalogue file.
 # Navigate to the directory where the data files are and run
 #
-#   python path/to/mdshare-index-maker.py path/to/template.yaml
+#   python path/to/mdshare-index-maker.py build path/to/template.yaml
 #
 # This will create a yaml file (NAME.yaml) and a corresponding MD5
 # checksum file (NAME.md5) where NAME corresponds to the 'name' entry
@@ -35,6 +35,10 @@ include:
   - doublewell_oneway.npy
   - hmm-doublewell-2d-100k.npz
   - mdshare-test-00.txt
+  - imd_channel_transitionmatrix.npy
+  - imd_full_system_trajectory.npy
+  - alanine_dipeptide_parallel_tempering_energies.npz
+  - alanine_dipeptide_parallel_tempering_dihedrals.npz
 containers:
   pyemma-tutorial-livecoms.tar.gz:
     - alanine-dipeptide-*-nowater.xtc
