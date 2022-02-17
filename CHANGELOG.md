@@ -27,6 +27,9 @@
 -   major refactoring to have an offline catalogue available
 -   allow to download/extract .tar.gz containers
 
+## 0.4.1
+-  updated file catalogue
+
 ### upcoming
 -   removed obsolete/unsused imports/variables/...
 -   replaced assert statements
