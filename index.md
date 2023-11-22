@@ -15,6 +15,7 @@ This website provides an overview which data is available.
 
 -  [Alanine dipeptide](ALA2#alanine-dipeptide)
 -  [Pentapeptide](pentapeptide#peptide)
+-  [Alanine dipeptide coarse grained with forces](ALA2CG#alanine-dipeptide-cg)
 
 ## Downloader installation
 
