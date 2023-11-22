@@ -25,7 +25,7 @@ permalink: /ALA2CG/
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a>
 
 ## Contents
-The molecule and system setup is essentially the same as in [the other alanine dipeptide dataset](ALA2#alanine-dipeptide). The major difference is that we cropped out the five backbone atoms (ACE-C ALA-N ALA-CA ALA-C NME-N) and recorded the coordinates and forces of them. The dataset contains four independent simulations, each of which consists of 250,000 frames (500 ns sampled with a 2-ps interval).
+The molecule and system setup is essentially the same as in [the other alanine dipeptide dataset](../ALA2#alanine-dipeptide). The major difference is that we cropped out the five backbone atoms (ACE-C ALA-N ALA-CA ALA-C NME-N) and recorded the coordinates and forces of them. The dataset contains four independent simulations, each of which consists of 250,000 frames (500 ns sampled with a 2-ps interval).
 Therefore, for cross-validation it is recommended to separate the data into four folds by indexing the arrays with **[250000 * i_fold:250000 * (i_fold + 1)]**.
 
 ### Raw data
