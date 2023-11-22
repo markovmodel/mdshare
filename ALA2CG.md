@@ -29,7 +29,7 @@ The molecule and system setup is essentially the same as in [the other alanine d
 Therefore, for cross-validation it is recommended to separate the data into four folds by indexing the arrays with **[250000 * i_fold:250000 * (i_fold + 1)]**.
 
 ### Raw data
-Shared PDB topology file, coordinates (key **coords**) and forces (key **aaFs**) on the five backbone atoms from four independent simulations (four trajectories were concatenated together **numpy.ndarray(shape=[1000000, 5, 3], dtype=numpy.float32)**).
+Shared PDB topology file, coordinates (key **coords**) and forces (key **aaFs**) on the five backbone atoms from four independent simulations (four trajectories were concatenated together **numpy.ndarray(shape=[1000000, 5, 3], dtype=numpy.float32)**). The unit of coordinates is Angstrom (0.1 nm) and for the forces kcal/(mol&middot;Angstrom).
 -  [ala2_cg.pdb](http://ftp.imp.fu-berlin.de/pub/cmb-data/ala2_cg.pdb)
 -  [ala2_cg_2fs_Hmass_2_HBonds.npz](http://ftp.imp.fu-berlin.de/pub/cmb-data/ala2_cg_2fs_Hmass_2_HBonds.npz)
 
